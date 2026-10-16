@@ -48,7 +48,7 @@ function NodesPage() {
   const nodeAlerts = (ip: string) => (alerts.data?.items ?? []).filter((a) => a.labels.ip === ip || a.labels.instance?.startsWith(ip))
 
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
       {nodes.data && !nodes.data.source.ok && (
         <Alert type="warning" showIcon title={`无法从 VictoriaMetrics 获取节点指标：${nodes.data.source.error ?? ''}`} description="可在「设置」中配置 VictoriaMetrics 地址。没有指标时，容量预估使用规划规格。" />
       )}

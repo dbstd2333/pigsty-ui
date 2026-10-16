@@ -65,7 +65,7 @@ function JobDetail() {
   const stats = Object.keys(stream.stats).length ? stream.stats : job.stats
 
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
       <Card
         size="small"
         title={
@@ -223,7 +223,7 @@ function TaskMatrix({ tasks, hosts }: { tasks: TaskRow[]; hosts: string[] }) {
   )
   if (!tasks.length) return <Empty description="还没有任务事件" />
   return (
-    <div style={{ display: 'grid', gap: 8 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 8 }}>
       <Space>
         <Segmented
           size="small"
@@ -291,7 +291,7 @@ function LogView({ lines, follow }: { lines: string[]; follow: boolean }) {
   }, [shown, auto, follow])
 
   return (
-    <div style={{ display: 'grid', gap: 8 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 8 }}>
       <Space>
         <Input.Search size="small" allowClear placeholder="过滤日志" onSearch={setFilter} style={{ width: 260 }} />
         {follow && (

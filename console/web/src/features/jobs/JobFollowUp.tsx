@@ -46,7 +46,7 @@ export function JobFollowUp({ job }: { job: Job }) {
         showIcon
         title="恢复已完成并暂停在目标位置，请验证数据"
         description={
-          <div style={{ display: 'grid', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 8 }}>
             <span>
               用只读连接核对关键表的行数和最近写入时间（例如 <code>psql -h &lt;主库IP&gt; -c &quot;SELECT count(*), max(updated_at) FROM ...&quot;</code>）。
               console 不会读取业务数据。确认无误后提升；如果目标不对，可以调整后重新恢复。

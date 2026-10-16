@@ -186,7 +186,7 @@ export function RunActionDialog({ action, params: initial = {}, lockParams = tru
       ) : !def ? (
         <Alert type="error" title={`后端未提供动作 ${action}`} />
       ) : (
-        <div style={{ display: 'grid', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
           <Typography.Text type="secondary">{def.description}</Typography.Text>
           <ParamForm def={def} params={params} locked={lockParams ? Object.keys(initial) : []} model={model} onChange={setParam} />
           {def.check && (
@@ -324,7 +324,7 @@ function ParamInput({
 
 export function PlanView({ plan }: { plan: ActionPlan | { commands: string[]; preconditions: ActionPlan['preconditions']; targets?: string[] } }) {
   return (
-    <div style={{ display: 'grid', gap: 8 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 8 }}>
       {plan.preconditions.length > 0 && (
         <div>
           {plan.preconditions.map((c) => (
@@ -389,7 +389,7 @@ export function GateForm({
             )}
           </div>
           {gate.checkboxes.length > 0 && (
-            <Checkbox.Group value={boxes} onChange={(v) => onBoxes(v as string[])} style={{ display: 'grid', gap: 4 }}>
+            <Checkbox.Group value={boxes} onChange={(v) => onBoxes(v as string[])} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 4 }}>
               {gate.checkboxes.map((b) => (
                 <Checkbox key={b} value={b}>
                   {b}

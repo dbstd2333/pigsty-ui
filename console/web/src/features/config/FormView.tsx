@@ -50,7 +50,7 @@ export function FormView({ text, model, scope, schema, onChange, onJump }: Props
   }, [vars, schema])
 
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
       <Space style={{ justifyContent: 'space-between', width: '100%' }} wrap>
         <Typography.Title level={5} style={{ margin: 0 }}>
           {scopeLabel(scope)}

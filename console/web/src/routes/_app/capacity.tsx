@@ -48,7 +48,7 @@ function CapacityPage() {
   const count = (l: NodeEstimate['level']) => rows.filter((r) => r.level === l).length
 
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
       <Row gutter={12}>
         <Col span={6}>
           <Card size="small">
@@ -203,7 +203,7 @@ function Breakdown({ e }: { e: NodeEstimate }) {
     .filter((x) => x.act !== undefined && Math.abs(x.act - x.c.typical) / Math.max(x.c.typical, 1) > 0.3)
 
   return (
-    <div style={{ display: 'grid', gap: 8 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 8 }}>
       <Space>
         <Button size="small" icon={<ExperimentOutlined />} onClick={() => setMeasure(true)} loading={mem.isFetching} disabled={measure && !!mem.data}>
           采集实测值

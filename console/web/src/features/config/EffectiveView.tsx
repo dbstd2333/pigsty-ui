@@ -37,7 +37,7 @@ export function EffectiveView({ model, savedHash, dirty, host, onHostChange }: P
   }, [q.data, filter, hideDefault])
 
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
       {dirty && <Alert type="info" showIcon title="有效值基于已保存的版本计算，不包含当前未保存的修改。" />}
       {q.data?.engine === 'builtin' && (
         <Alert type="warning" showIcon title="本机没有 ansible-inventory，有效值由内置规则计算，组优先级与 Ansible 可能有细微差异。" />

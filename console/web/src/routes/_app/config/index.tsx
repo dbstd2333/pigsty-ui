@@ -97,7 +97,7 @@ function Workbench() {
   const errorCount = issues.filter((i) => i.level === 'error').length
 
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
       <Space style={{ justifyContent: 'space-between', width: '100%' }} wrap>
         <Space>
           <Typography.Title level={4} style={{ margin: 0 }}>

@@ -156,7 +156,7 @@ function PitrWizard() {
   if (backups.isLoading) return <Spin style={{ display: 'block', marginTop: 80 }} />
 
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
       <Typography.Title level={4} style={{ margin: 0 }}>
         <Link to="/clusters/$cls" params={{ cls }}>
           {cls}

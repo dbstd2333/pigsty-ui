@@ -35,7 +35,7 @@ function ClustersPage() {
   }
 
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
       <Card
         size="small"
         title={<Space><DatabaseOutlined />PostgreSQL 集群</Space>}

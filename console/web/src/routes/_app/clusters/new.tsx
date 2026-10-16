@@ -55,7 +55,7 @@ function NewCluster() {
   const { model } = useSavedModel()
   if (!model) return null
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
       <Radio.Group
         optionType="button"
         buttonStyle="solid"
@@ -153,7 +153,7 @@ function Finish({
   }
 
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
       {errors.length > 0 && <Alert type="error" showIcon title="请先修正" description={<ul style={{ margin: 0, paddingInlineStart: 18 }}>{errors.map((e) => <li key={e}>{e}</li>)}</ul>} />}
       <Row gutter={12}>
         <Col span={12}>
@@ -165,7 +165,7 @@ function Finish({
         </Col>
         <Col span={12}>
           <Card size="small" title="涉及节点的内存预估">
-            <div style={{ display: 'grid', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
               {ips.map((ip) => {
                 const e = estimateNode(ip, { model: newModel, schema: schema.data, specs, baseline })
                 return (
@@ -375,7 +375,7 @@ function PgWizard({ model }: { model: ConfigModel }) {
         </div>
       )}
       {step === 2 && (
-        <div style={{ display: 'grid', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 16 }}>
           <Card size="small" type="inner" title="业务用户（pg_users）">
             <Table
               size="small"
@@ -571,7 +571,7 @@ function RedisWizard({ model }: { model: ConfigModel }) {
         </Form>
       )}
       {step === 1 && (
-        <div style={{ display: 'grid', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
           {spec.nodes.map((n, i) => (
             <Card
               key={i}

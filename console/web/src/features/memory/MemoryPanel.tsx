@@ -32,7 +32,7 @@ export function MemoryPanel({
     return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={scope.kind === 'global' ? '没有内存偏高的节点。选择组或主机查看明细。' : '没有节点'} />
 
   return (
-    <div style={{ display: 'grid', gap: 14 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 14 }}>
       {rows.map((e) => {
         const b = before.get(e.ip)
         const delta = b ? e.typical - b.typical : 0

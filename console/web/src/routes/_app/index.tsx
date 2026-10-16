@@ -41,7 +41,7 @@ function Overview() {
   const maxAge = settings.data?.backupMaxAgeHours ?? 26
 
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
       {restoring.map((j) => (
         <Alert
           key={j.id}
@@ -163,7 +163,7 @@ function Overview() {
           </Card>
         </Col>
         <Col span={9}>
-          <div style={{ display: 'grid', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
             <Card size="small" title="最近作业" extra={<Link to="/jobs">全部</Link>}>
               {(jobs.data?.items ?? []).length === 0 && <Typography.Text type="secondary">暂无作业</Typography.Text>}
               {(jobs.data?.items ?? []).map((j) => (

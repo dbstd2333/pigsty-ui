@@ -24,7 +24,7 @@ export function IssuesPanel({ issues, serverChecking, serverCheckedAt, onServerC
   const sorted = [...issues].sort((a, b) => Number(a.level !== 'error') - Number(b.level !== 'error'))
 
   return (
-    <div style={{ display: 'grid', gap: 8 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 8 }}>
       <Space style={{ justifyContent: 'space-between', width: '100%' }}>
         <Space>
           <Badge count={errors} showZero color={errors ? '#ff4d4f' : '#52c41a'} />

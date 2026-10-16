@@ -87,7 +87,7 @@ function PendingCard({ cls }: { cls: string }) {
       ) : !plan?.changed ? (
         <Typography.Text type="secondary">配置与最近一次执行时一致，没有待应用的变更。</Typography.Text>
       ) : (
-        <div style={{ display: 'grid', gap: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 8 }}>
           {!plan.applied && <Alert type="info" showIcon title="这是新集群，尚未通过 console 部署。按顺序执行下面的动作。" />}
           {plan.suggestions.map((s, i) => (
             <Space key={s.key} style={{ justifyContent: 'space-between', width: '100%' }}>
@@ -128,7 +128,7 @@ function PgDetail({ group }: { group: GroupModel }) {
   const dbs = Array.isArray(group.vars.pg_databases) ? (group.vars.pg_databases as Record<string, unknown>[]) : []
 
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
       <Header
         group={group}
         extra={
@@ -154,7 +154,7 @@ function PgDetail({ group }: { group: GroupModel }) {
             key: 'members',
             label: '成员与拓扑',
             children: (
-              <div style={{ display: 'grid', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
                 <Card
                   size="small"
                   title={
@@ -416,7 +416,7 @@ function AccessTab({ group }: { group: GroupModel }) {
         </Card>
       </Col>
       <Col span={12}>
-        <div style={{ display: 'grid', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
           <Card
             size="small"
             title={`自定义服务（${svcs.length}）`}
@@ -583,7 +583,7 @@ function RedisDetail({ group }: { group: GroupModel }) {
     )
   const monitors = Array.isArray(group.vars.redis_sentinel_monitor) ? (group.vars.redis_sentinel_monitor as Record<string, unknown>[]) : []
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
       <Header
         group={group}
         extra={
