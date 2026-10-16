@@ -1,0 +1,464 @@
+# 人工补充的参数 Schema 覆盖。
+# schemagen 先扫描 roles/*/defaults/main.yml，再用本文件覆盖/补齐：
+#   - params.<key> 中出现的字段会替换生成值，未出现的字段保留生成值；
+#   - params 里但角色 defaults 中不存在的键会作为新参数加入；
+#   - defs 为复杂对象定义，供 items.$ref 引用。
+# 字段取值参考 DESIGN.md §5.2 与 bin/validate 的字段表。
+version: v4.5.0
+
+params:
+  #---------------------------------------------------------------#
+  # 身份参数：defaults 中被注释掉（无默认值），必须显式声明
+  #---------------------------------------------------------------#
+  pg_mode:
+    type: string
+    level: CLUSTER
+    identity: true
+    impact: init-only
+    enum: [pgsql, citus, mssql, mysql, ivory, pgtde, polar, gpsql, agens, oriole, pgedge]
+    label: PG 集群模式
+    doc: https://pigsty.io/docs/pgsql/param
+  pg_cluster:
+    type: string
+    level: CLUSTER
+    identity: true
+    impact: init-only
+    label: PG 集群名
+  pg_role:
+    type: string
+    level: INSTANCE
+    identity: true
+    impact: init-only
+    enum: [primary, replica, standby, offline, delayed]
+    label: 实例角色
+  pg_seq:
+    type: integer
+    level: INSTANCE
+    identity: true
+    impact: init-only
+    label: 实例序号
+  pg_instances:
+    type: object
+    level: INSTANCE
+    impact: init-only
+  pg_upstream:
+    type: string
+    level: INSTANCE
+    impact: init-only
+  pg_shard:
+    type: string
+    level: CLUSTER
+    identity: true
+    impact: init-only
+  pg_group:
+    type: integer
+    level: CLUSTER
+    impact: init-only
+  gp_role:
+    type: string
+    level: CLUSTER
+    enum: [master, segment]
+  infra_seq:
+    type: integer
+    level: INSTANCE
+    identity: true
+    impact: init-only
+  etcd_cluster:
+    type: string
+    level: CLUSTER
+    identity: true
+    impact: init-only
+  etcd_seq:
+    type: integer
+    level: INSTANCE
+    identity: true
+    impact: init-only
+  minio_cluster:
+    type: string
+    level: CLUSTER
+    identity: true
+    impact: init-only
+  minio_seq:
+    type: integer
+    level: INSTANCE
+    identity: true
+    impact: init-only
+  redis_cluster:
+    type: string
+    level: CLUSTER
+    identity: true
+    impact: init-only
+  redis_seq:
+    module: REDIS
+    type: integer
+    level: INSTANCE
+    identity: true
+    impact: init-only
+  nodename:
+    type: string
+    level: INSTANCE
+    identity: true
+    impact: init-only
+  node_cluster:
+    type: string
+    level: CLUSTER
+    impact: init-only
+  docker_enabled:
+    identity: true
+  app:
+    module: APP
+    type: string
+    level: CLUSTER
+    identity: true
+    doc: https://pigsty.io/docs/app
+  apps:
+    module: APP
+    type: object
+    level: CLUSTER
+    identity: true
+    items: { $ref: '#/defs/app' }
+    doc: https://pigsty.io/docs/app
+  version:
+    module: INFRA
+    type: string
+    level: GLOBAL
+    label: Pigsty 版本
+  admin_ip:
+    module: INFRA
+    type: string
+    level: GLOBAL
+    label: 管理节点 IP
+  node_admin_pk_list:
+    module: NODE
+    type: array
+    level: CLUSTER
+    items: { type: string }
+  pg_packages:
+    module: PGSQL
+    type: array
+    items: { type: string }
+
+  #---------------------------------------------------------------#
+  # 枚举（取值来自上游 defaults 注释与 bin/validate）
+  #---------------------------------------------------------------#
+  pg_conf:
+    type: string
+    level: CLUSTER
+    impact: restart
+    enum: [oltp.yml, olap.yml, crit.yml, tiny.yml]
+    label: PG 调优模板
+    doc: https://pigsty.io/docs/pgsql/param
+  pgbackrest_method:
+    type: string
+    level: CLUSTER
+    impact: playbook
+    enum: [local, minio]
+    label: 备份仓库类型
+  node_tune:
+    type: string
+    level: CLUSTER
+    impact: playbook
+    enum: [none, oltp, olap, crit, tiny]
+    label: 节点调优模板
+    doc: https://pigsty.io/docs/node/param
+  region:
+    type: string
+    level: GLOBAL
+    enum: [default, china, europe]
+  language:
+    type: string
+    level: GLOBAL
+    enum: [en, zh]
+  patroni_mode:
+    type: string
+    level: CLUSTER
+    enum: [default, pause, remove]
+  pg_io_method:
+    type: string
+    level: GLOBAL
+    enum: [auto, fsync, worker, io_uring]
+  pg_storage_type:
+    type: string
+    level: CLUSTER
+    enum: [SSD, HDD]
+  pg_dns_target:
+    type: string
+    level: CLUSTER
+    enum: [auto, primary, vip, none]
+  pg_rto:
+    type: string
+    level: CLUSTER
+    enum: [fast, norm, safe, wide]
+  pgbouncer_poolmode:
+    type: string
+    level: CLUSTER
+    impact: restart
+    enum: [transaction, session, statement]
+  node_firewall_mode:
+    type: string
+    level: CLUSTER
+    enum: [zone, off, none]
+  node_selinux_mode:
+    type: string
+    level: CLUSTER
+    enum: [enforcing, permissive, disabled]
+  node_dns_method:
+    type: string
+    level: CLUSTER
+    enum: [add, none, overwrite]
+  node_admin_sudo:
+    type: string
+    level: CLUSTER
+    enum: [all, nopass]
+  pg_dbsu_sudo:
+    type: string
+    level: CLUSTER
+    enum: [none, limit, all, nopass]
+  nginx_sslmode:
+    type: string
+    level: GLOBAL
+    enum: [disable, enable, enforce]
+  minio_type:
+    type: string
+    level: CLUSTER
+    enum: [silo]
+  pg_delay:
+    type: integer
+    level: CLUSTER
+  pg_rpo:
+    type: integer
+    level: CLUSTER
+
+  #---------------------------------------------------------------#
+  # 复杂对象：数组/映射元素用 defs 描述
+  #---------------------------------------------------------------#
+  pg_users:
+    type: array
+    level: CLUSTER
+    impact: action:pgsql-user
+    items: { $ref: '#/defs/pg_user' }
+    label: 业务用户
+    doc: https://pigsty.io/docs/pgsql/config/user
+  pg_databases:
+    type: array
+    level: CLUSTER
+    impact: action:pgsql-db
+    items: { $ref: '#/defs/pg_database' }
+    label: 业务数据库
+    doc: https://pigsty.io/docs/pgsql/config/db
+  pg_hba_rules:
+    type: array
+    level: CLUSTER
+    impact: action:pgsql-hba
+    items: { $ref: '#/defs/hba_rule' }
+    label: HBA 规则
+    doc: https://pigsty.io/docs/pgsql/config/hba
+  pgb_hba_rules:
+    type: array
+    level: CLUSTER
+    impact: action:pgsql-hba
+    items: { $ref: '#/defs/hba_rule' }
+    label: Pgbouncer HBA 规则
+    doc: https://pigsty.io/docs/pgsql/config/hba
+  pg_default_hba_rules:
+    type: array
+    level: CLUSTER
+    items: { $ref: '#/defs/hba_rule' }
+    doc: https://pigsty.io/docs/pgsql/config/hba
+  pgb_default_hba_rules:
+    type: array
+    level: CLUSTER
+    items: { $ref: '#/defs/hba_rule' }
+    doc: https://pigsty.io/docs/pgsql/config/hba
+  pg_services:
+    type: array
+    level: CLUSTER
+    impact: action:pgsql-svc
+    items: { $ref: '#/defs/pg_service' }
+    label: 服务定义
+    doc: https://pigsty.io/docs/pgsql/service
+  pg_default_services:
+    type: array
+    level: CLUSTER
+    items: { $ref: '#/defs/pg_service' }
+    doc: https://pigsty.io/docs/pgsql/service
+  pg_default_roles:
+    type: array
+    level: CLUSTER
+    items: { $ref: '#/defs/pg_user' }
+    doc: https://pigsty.io/docs/pgsql/config/user
+  pgbackrest_repo:
+    type: object
+    level: CLUSTER
+    impact: playbook
+    items: { $ref: '#/defs/pgbackrest_repo' }
+    label: 备份仓库
+    doc: https://pigsty.io/docs/pgsql/backup
+  infra_portal:
+    type: object
+    level: GLOBAL
+    impact: reload
+    items: { $ref: '#/defs/infra_portal_entry' }
+    label: 门户服务
+    doc: https://pigsty.io/docs/infra/param
+  infra_services:
+    type: array
+    level: GLOBAL
+    items: { $ref: '#/defs/infra_service_entry' }
+  node_etc_hosts:
+    type: array
+    level: CLUSTER
+    items: { type: string }
+  node_firewall_public_port:
+    type: array
+    level: CLUSTER
+    items: { type: integer }
+
+defs:
+  pg_user:
+    type: object
+    required: [name]
+    properties:
+      name: { type: string }
+      password: { type: string, sensitive: true }
+      login: { type: boolean }
+      superuser: { type: boolean }
+      createdb: { type: boolean }
+      createrole: { type: boolean }
+      inherit: { type: boolean }
+      replication: { type: boolean }
+      bypassrls: { type: boolean }
+      connlimit: { type: integer }
+      expire_in: { type: integer }
+      expire_at: { type: string }
+      comment: { type: string }
+      roles: { type: array, items: { type: string } }
+      parameters: { type: object }
+      pgbouncer: { type: boolean }
+      pool_mode: { enum: [transaction, session, statement] }
+      pool_connlimit: { type: integer }
+      state: { enum: [create, absent] }
+
+  pg_database:
+    type: object
+    required: [name]
+    properties:
+      name: { type: string }
+      baseline: { type: string }
+      owner: { type: string }
+      template: { type: string }
+      encoding: { type: string }
+      locale: { type: string }
+      lc_collate: { type: string }
+      lc_ctype: { type: string }
+      tablespace: { type: string }
+      allowconn: { type: boolean }
+      revokeconn: { type: boolean }
+      register_datasource: { type: boolean }
+      connlimit: { type: integer }
+      schemas: { type: array, items: { type: string } }
+      extensions: { type: array, items: { type: string } }
+      comment: { type: string }
+      parameters: { type: object }
+      pgbouncer: { type: boolean }
+      pool_auth_user: { type: string }
+      pool_mode: { enum: [transaction, session, statement] }
+      pool_size: { type: integer }
+      pool_size_min: { type: integer }
+      pool_reserve: { type: integer }
+      pool_connlimit: { type: integer }
+      state: { enum: [create, absent] }
+
+  hba_rule:
+    type: object
+    properties:
+      title: { type: string }
+      rules: { type: array, items: { type: string } }
+      addr:
+        enum: [world, intra, infra, admin, local, localhost, cluster]
+      auth:
+        enum: [deny, trust, pwd, sha, scram-sha-256, md5, ssl, ssl-md5, ssl-sha, os, ident, peer, cert]
+      user: { type: string }
+      db: { type: string }
+      order: { type: integer }
+
+  pg_service:
+    type: object
+    required: [name, port]
+    properties:
+      name: { type: string }
+      port: { type: integer }
+      ip: { type: string }
+      selector: { type: string }
+      backup: { type: string }
+      dest: { enum: [default, postgres, pgbouncer] }
+      check: { type: string }
+      maxconn: { type: integer }
+      options: { type: string }
+      balance: { enum: [roundrobin, leastconn] }
+      state: { enum: [create, absent] }
+
+  pgbackrest_repo:
+    type: object
+    properties:
+      type: { enum: [posix, s3, gcs, azure, sftp] }
+      path: { type: string }
+      s3_endpoint: { type: string }
+      s3_region: { type: string }
+      s3_bucket: { type: string }
+      s3_key: { type: string }
+      s3_key_secret: { type: string, sensitive: true }
+      s3_uri_style: { enum: [path, host] }
+      storage_port: { type: integer }
+      storage_ca_file: { type: string }
+      block: { type: string }
+      bundle: { type: string }
+      bundle_limit: { type: string }
+      bundle_size: { type: string }
+      cipher_type: { enum: [none, aes-256-cbc] }
+      cipher_pass: { type: string, sensitive: true }
+      retention_full_type: { enum: [count, time, version] }
+      retention_full: { type: integer }
+      retention_diff_type: { enum: [count, time, version] }
+      retention_diff: { type: integer }
+      retention_archive_type: { enum: [count, time] }
+      retention_archive: { type: integer }
+
+  infra_portal_entry:
+    type: object
+    required: [domain]
+    properties:
+      domain: { type: string }
+      domains: { type: array, items: { type: string } }
+      endpoint: { type: string }
+      path: { type: string }
+      index: { type: boolean }
+      scheme: { enum: [http, https] }
+      websocket: { type: boolean }
+      auth: { type: boolean }
+      realm: { type: string }
+      cert: { type: string }
+      key: { type: string }
+      log: { type: string }
+      certbot: { type: string }
+      enforce_https: { type: boolean }
+      config: { type: string }
+      conf: { type: string }
+
+  infra_service_entry:
+    type: object
+    required: [name, url]
+    properties:
+      name: { type: string }
+      url: { type: string }
+      desc: { type: string }
+      icon: { type: string }
+      name_cn: { type: string }
+      desc_cn: { type: string }
+
+  app:
+    type: object
+    properties:
+      conf: { type: object }
+      image: { type: string }
+      ports: { type: array, items: { type: string } }

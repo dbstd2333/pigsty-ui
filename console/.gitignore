@@ -1,0 +1,6 @@
+# 本地数据目录（SQLite + 配置 git 仓库）
+.data/
+
+# 本地构建产物
+pigsty-console
+.tasks/*.log

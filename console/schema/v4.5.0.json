@@ -1,0 +1,5092 @@
+{
+  "version": "v4.5.0",
+  "modules": [
+    "INFRA",
+    "NODE",
+    "ETCD",
+    "MINIO",
+    "PGSQL",
+    "REDIS",
+    "DOCKER",
+    "APP",
+    "MYSQL",
+    "KAFKA",
+    "OTHER"
+  ],
+  "params": {
+    "action": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "string",
+      "desc": "Post-recovery action: pause, promote, shutdown"
+    },
+    "admin_ip": {
+      "module": "INFRA",
+      "section": "INFRA_META",
+      "role": "infra",
+      "level": "GLOBAL",
+      "type": "string",
+      "default": "10.10.10.10",
+      "desc": "admin node ip address, overwritten by configure",
+      "label": "管理节点 IP"
+    },
+    "alertmanager_enabled": {
+      "module": "INFRA",
+      "section": "PROMETHEUS",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "setup alertmanager on this infra node?"
+    },
+    "alertmanager_options": {
+      "module": "INFRA",
+      "section": "PROMETHEUS",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "alertmanager extra server options"
+    },
+    "alertmanager_port": {
+      "module": "INFRA",
+      "section": "PROMETHEUS",
+      "role": "infra",
+      "level": "",
+      "type": "integer",
+      "default": 9059,
+      "desc": "alertmanager listen port, 9059 by default"
+    },
+    "app": {
+      "module": "APP",
+      "level": "CLUSTER",
+      "type": "string",
+      "identity": true,
+      "doc": "https://pigsty.io/docs/app"
+    },
+    "apps": {
+      "module": "APP",
+      "level": "CLUSTER",
+      "type": "object",
+      "identity": true,
+      "doc": "https://pigsty.io/docs/app",
+      "items": {
+        "$ref": "#/defs/app"
+      }
+    },
+    "archive": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "boolean",
+      "desc": "Preserve archive settings? true by default, set to false for exploratory PITR"
+    },
+    "backup": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "boolean",
+      "desc": "Backup existing data to /pg/data-backup before restore?"
+    },
+    "blackbox_enabled": {
+      "module": "INFRA",
+      "section": "PROMETHEUS",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "setup blackbox_exporter on this infra node?"
+    },
+    "blackbox_options": {
+      "module": "INFRA",
+      "section": "PROMETHEUS",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "blackbox_exporter extra server options"
+    },
+    "blackbox_port": {
+      "module": "INFRA",
+      "section": "PROMETHEUS",
+      "role": "infra",
+      "level": "",
+      "type": "integer",
+      "default": 9115,
+      "desc": "blackbox_exporter listen port, 9115 by default"
+    },
+    "ca_cn": {
+      "module": "INFRA",
+      "section": "CA",
+      "role": "ca",
+      "level": "",
+      "type": "string",
+      "default": "pigsty-ca",
+      "desc": "ca common name, fixed as pigsty-ca"
+    },
+    "ca_create": {
+      "module": "INFRA",
+      "section": "CA",
+      "role": "ca",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "create ca if not exists? or just abort"
+    },
+    "cache_pkg_dir": {
+      "module": "INFRA",
+      "section": "CACHE",
+      "role": "cache",
+      "level": "",
+      "type": "string",
+      "default": "dist/${version}",
+      "desc": "where to store the cached package? dist/${version} by default"
+    },
+    "cache_pkg_name": {
+      "module": "INFRA",
+      "section": "CACHE",
+      "role": "cache",
+      "level": "",
+      "type": "string",
+      "default": "pigsty-pkg-${version}.${os}.${arch}.tgz",
+      "desc": "cache offline package filename pattern"
+    },
+    "cache_repo": {
+      "module": "INFRA",
+      "section": "CACHE",
+      "role": "cache",
+      "level": "",
+      "type": "string",
+      "default": "pigsty",
+      "desc": "target repo(s) to be cached, use `,` to separate multiple repos"
+    },
+    "cache_tmp_dir": {
+      "module": "INFRA",
+      "section": "CACHE",
+      "role": "cache",
+      "level": "",
+      "type": "string",
+      "default": "/var/tmp",
+      "desc": "remote working directory for the cache tarball"
+    },
+    "cert_validity": {
+      "module": "INFRA",
+      "section": "CA",
+      "role": "ca",
+      "level": "",
+      "type": "string",
+      "default": "7300d",
+      "desc": "cert validity, 20 years by default"
+    },
+    "certbot_email": {
+      "module": "INFRA",
+      "section": "NGINX",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "your@email.com",
+      "desc": "certbot email address, used for free ssl"
+    },
+    "certbot_options": {
+      "module": "INFRA",
+      "section": "NGINX",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "certbot extra options"
+    },
+    "certbot_sign": {
+      "module": "INFRA",
+      "section": "NGINX",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "sign nginx cert with certbot during setup?"
+    },
+    "claude_enabled": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "install and configure claude code cli"
+    },
+    "claude_env": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "object",
+      "default": {},
+      "desc": "extra env vars to merge with otel defaults"
+    },
+    "claude_package": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "string",
+      "default": "@anthropic-ai/claude-code",
+      "desc": "npm package used to install claude code"
+    },
+    "clsname": {
+      "module": "PGSQL",
+      "section": "CLI ARG",
+      "role": "pg_exporters",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "if specified, only this pg_cluster will be init"
+    },
+    "cluster": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "string",
+      "desc": "Source cluster name (stanza), defaults to pg_cluster"
+    },
+    "code_data": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "string",
+      "default": "/data/code",
+      "desc": "code-server user data directory"
+    },
+    "code_enabled": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable code-server installation"
+    },
+    "code_gallery": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "string",
+      "default": "openvsx",
+      "desc": "extension gallery: openvsx|microsoft"
+    },
+    "code_password": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "string",
+      "default": "Vibe.Coding",
+      "desc": "code-server password"
+    },
+    "code_port": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "integer",
+      "default": 8443,
+      "desc": "code-server listen port"
+    },
+    "codex_enabled": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "install codex cli package only"
+    },
+    "context_dir": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "default": "~/migration",
+      "desc": "migration manuals \u0026 scripts"
+    },
+    "data": {
+      "module": "OTHER",
+      "role": "juice",
+      "level": "",
+      "type": "string",
+      "desc": "format options (storage backend), default: ''"
+    },
+    "db_exclude": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "array",
+      "desc": "Exclude these databases"
+    },
+    "db_include": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "array",
+      "desc": "Include only these databases"
+    },
+    "dns_enabled": {
+      "module": "INFRA",
+      "section": "DNS",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "setup dnsmasq on this infra node?"
+    },
+    "dns_port": {
+      "module": "INFRA",
+      "section": "DNS",
+      "role": "infra",
+      "level": "",
+      "type": "integer",
+      "default": 53,
+      "desc": "dns server listen port, 53 by default"
+    },
+    "dns_records": {
+      "module": "INFRA",
+      "section": "DNS",
+      "role": "infra",
+      "level": "",
+      "type": "array",
+      "default": [
+        "${admin_ip} i.pigsty",
+        "${admin_ip} m.pigsty supa.pigsty api.pigsty adm.pigsty cli.pigsty ddl.pigsty"
+      ],
+      "desc": "dynamic dns records resolved by dnsmasq"
+    },
+    "docker_cgroups_driver": {
+      "module": "DOCKER",
+      "section": "DOCKER",
+      "role": "docker",
+      "level": "",
+      "type": "string",
+      "default": "systemd",
+      "desc": "docker cgroup fs driver: cgroupfs,systemd"
+    },
+    "docker_data": {
+      "module": "DOCKER",
+      "section": "DOCKER",
+      "role": "docker",
+      "level": "",
+      "type": "string",
+      "default": "/data/docker",
+      "desc": "docker data directory, /data/docker by default"
+    },
+    "docker_enabled": {
+      "module": "DOCKER",
+      "section": "DOCKER",
+      "role": "docker",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "identity": true,
+      "desc": "enable docker on this node?"
+    },
+    "docker_exporter_port": {
+      "module": "DOCKER",
+      "section": "DOCKER",
+      "role": "docker",
+      "level": "",
+      "type": "integer",
+      "default": 9323,
+      "desc": "docker metrics exporter port, 9323 by default"
+    },
+    "docker_image": {
+      "module": "DOCKER",
+      "section": "DOCKER",
+      "role": "docker",
+      "level": "",
+      "type": "array",
+      "default": [],
+      "desc": "docker image to be pulled after bootstrap"
+    },
+    "docker_image_cache": {
+      "module": "DOCKER",
+      "section": "DOCKER",
+      "role": "docker",
+      "level": "",
+      "type": "string",
+      "default": "/tmp/docker/*.tgz",
+      "desc": "docker image cache glob pattern"
+    },
+    "docker_registry_mirrors": {
+      "module": "DOCKER",
+      "section": "DOCKER",
+      "role": "docker",
+      "level": "",
+      "type": "array",
+      "default": [],
+      "desc": "docker registry mirror list"
+    },
+    "docker_storage_driver": {
+      "module": "DOCKER",
+      "section": "DOCKER",
+      "role": "docker",
+      "level": "",
+      "type": "string",
+      "default": "overlay2",
+      "desc": "docker storage driver, can be zfs, btrfs"
+    },
+    "dst_cls": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "desc": "dst cluster name         \u003cREQUIRED\u003e"
+    },
+    "dst_db": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "desc": "dst database name        \u003cREQUIRED\u003e"
+    },
+    "dst_dns": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "desc": "dst cluster dns name     [OPTIONAL]"
+    },
+    "dst_ip": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "desc": "dst cluster primary ip   \u003cREQUIRED\u003e"
+    },
+    "dst_pg": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "desc": "if defined, use this as dst dbsu pgurl instead of:"
+    },
+    "dst_user": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "desc": "dst cluster user         [OPTIONAL]"
+    },
+    "dst_vip": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "desc": "dst cluster vip address  [OPTIONAL]"
+    },
+    "etcd_cluster": {
+      "module": "ETCD",
+      "section": "ETCD",
+      "role": "etcd",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "etcd",
+      "identity": true,
+      "impact": "init-only",
+      "desc": "etcd cluster \u0026 group name, etcd by default"
+    },
+    "etcd_data": {
+      "module": "ETCD",
+      "section": "ETCD",
+      "role": "etcd",
+      "level": "",
+      "type": "string",
+      "default": "/data/etcd",
+      "desc": "etcd data directory, /data/etcd by default"
+    },
+    "etcd_election_timeout": {
+      "module": "ETCD",
+      "section": "ETCD",
+      "role": "etcd",
+      "level": "",
+      "type": "integer",
+      "default": 1000,
+      "desc": "etcd election timeout, 1000ms by default"
+    },
+    "etcd_heartbeat_interval": {
+      "module": "ETCD",
+      "section": "ETCD",
+      "role": "etcd",
+      "level": "",
+      "type": "integer",
+      "default": 100,
+      "desc": "etcd heartbeat interval, 100ms by default"
+    },
+    "etcd_init": {
+      "module": "ETCD",
+      "section": "ETCD",
+      "role": "etcd",
+      "level": "",
+      "type": "string",
+      "default": "new",
+      "desc": "etcd initial cluster state, new or existing"
+    },
+    "etcd_learner": {
+      "module": "ETCD",
+      "section": "ETCD",
+      "role": "etcd",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "etcd instance run as learner? false by default"
+    },
+    "etcd_peer_port": {
+      "module": "ETCD",
+      "section": "ETCD",
+      "role": "etcd",
+      "level": "",
+      "type": "integer",
+      "default": 2380,
+      "desc": "etcd peer port, 2380 by default"
+    },
+    "etcd_port": {
+      "module": "ETCD",
+      "section": "ETCD",
+      "role": "etcd",
+      "level": "",
+      "type": "integer",
+      "default": 2379,
+      "desc": "etcd client port, 2379 by default"
+    },
+    "etcd_rm_data": {
+      "module": "ETCD",
+      "section": "ETCD_REMOVE",
+      "role": "etcd_remove",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "purging etcd data and config? true by default"
+    },
+    "etcd_rm_pkg": {
+      "module": "ETCD",
+      "section": "ETCD_REMOVE",
+      "role": "etcd_remove",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "uninstall etcd packages? false by default"
+    },
+    "etcd_root_password": {
+      "module": "ETCD",
+      "section": "ETCD",
+      "role": "etcd",
+      "level": "",
+      "type": "string",
+      "default": "Etcd.Root",
+      "desc": "etcd root password for RBAC, change it!"
+    },
+    "etcd_safeguard": {
+      "module": "ETCD",
+      "section": "ETCD_REMOVE",
+      "role": "etcd_remove",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "prevents purging etcd instance? false by default"
+    },
+    "etcd_seq": {
+      "module": "ETCD",
+      "section": "ETCD",
+      "role": "etcd",
+      "level": "INSTANCE",
+      "type": "integer",
+      "identity": true,
+      "impact": "init-only",
+      "desc": "etcd instance identifier, explicitly required"
+    },
+    "exclusive": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "boolean",
+      "desc": "Exclude the target point, default false"
+    },
+    "exporter_metrics_path": {
+      "module": "INFRA",
+      "section": "PROMETHEUS",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "/metrics",
+      "desc": "exporter metric path, `/metrics` by default"
+    },
+    "gp_role": {
+      "module": "PGSQL",
+      "section": "PG_IDENTITY",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "string",
+      "enum": [
+        "master",
+        "segment"
+      ],
+      "desc": "greenplum role of this cluster, could be master or segment"
+    },
+    "grafana_admin_password": {
+      "module": "INFRA",
+      "section": "GRAFANA",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "pigsty",
+      "desc": "grafana admin password, `pigsty` by default"
+    },
+    "grafana_admin_username": {
+      "module": "INFRA",
+      "section": "GRAFANA",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "admin",
+      "desc": "grafana admin username, `admin` by default"
+    },
+    "grafana_auth_proxy": {
+      "module": "INFRA",
+      "section": "GRAFANA",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "enable grafana auth proxy?"
+    },
+    "grafana_clean": {
+      "module": "INFRA",
+      "section": "GRAFANA",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "clean grafana data during init?"
+    },
+    "grafana_enabled": {
+      "module": "INFRA",
+      "section": "GRAFANA",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable grafana on this infra node?"
+    },
+    "grafana_pgurl": {
+      "module": "INFRA",
+      "section": "GRAFANA",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "external postgres database url for grafana if given"
+    },
+    "grafana_port": {
+      "module": "INFRA",
+      "section": "GRAFANA",
+      "role": "infra",
+      "level": "",
+      "type": "integer",
+      "default": 3000,
+      "desc": "default listen port for grafana"
+    },
+    "grafana_view_password": {
+      "module": "INFRA",
+      "section": "GRAFANA",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "DBUser.Viewer",
+      "desc": "password for grafana meta pg datasource"
+    },
+    "group": {
+      "module": "OTHER",
+      "role": "juice",
+      "level": "",
+      "type": "string",
+      "desc": "mountpoint group, default: root"
+    },
+    "haproxy_admin_password": {
+      "module": "NODE",
+      "section": "HAPROXY",
+      "role": "haproxy",
+      "level": "",
+      "type": "string",
+      "default": "pigsty",
+      "desc": "haproxy admin password, `pigsty` by default"
+    },
+    "haproxy_admin_username": {
+      "module": "NODE",
+      "section": "HAPROXY",
+      "role": "haproxy",
+      "level": "",
+      "type": "string",
+      "default": "admin",
+      "desc": "haproxy admin username, `admin` by default"
+    },
+    "haproxy_auth_enabled": {
+      "module": "NODE",
+      "section": "HAPROXY",
+      "role": "haproxy",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable authentication for haproxy admin page"
+    },
+    "haproxy_clean": {
+      "module": "NODE",
+      "section": "HAPROXY",
+      "role": "haproxy",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "cleanup all existing haproxy config?"
+    },
+    "haproxy_client_timeout": {
+      "module": "NODE",
+      "section": "HAPROXY",
+      "role": "haproxy",
+      "level": "",
+      "type": "string",
+      "default": "24h",
+      "desc": "client side connection timeout, 24h by default"
+    },
+    "haproxy_enabled": {
+      "module": "NODE",
+      "section": "HAPROXY",
+      "role": "haproxy",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable haproxy on this node?"
+    },
+    "haproxy_exporter_port": {
+      "module": "NODE",
+      "section": "HAPROXY",
+      "role": "haproxy",
+      "level": "",
+      "type": "integer",
+      "default": 9101,
+      "desc": "haproxy admin/exporter port, 9101 by default"
+    },
+    "haproxy_reload": {
+      "module": "NODE",
+      "section": "HAPROXY",
+      "role": "haproxy",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "reload haproxy after config?"
+    },
+    "haproxy_server_timeout": {
+      "module": "NODE",
+      "section": "HAPROXY",
+      "role": "haproxy",
+      "level": "",
+      "type": "string",
+      "default": "24h",
+      "desc": "server side connection timeout, 24h by default"
+    },
+    "haproxy_services": {
+      "module": "NODE",
+      "section": "HAPROXY",
+      "role": "haproxy",
+      "level": "",
+      "type": "array",
+      "default": [],
+      "desc": "list of haproxy service to be exposed"
+    },
+    "https": {
+      "module": "OTHER",
+      "role": "juice",
+      "level": "",
+      "type": "string"
+    },
+    "infra_data": {
+      "module": "INFRA",
+      "section": "INFRA_IDENTITY",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "/data/infra",
+      "desc": "default data path for infrastructure data"
+    },
+    "infra_extra_services": {
+      "module": "INFRA",
+      "section": "INFRA_IDENTITY",
+      "role": "infra",
+      "level": "",
+      "type": "array",
+      "default": [],
+      "desc": "extra services to be added on infra home page"
+    },
+    "infra_packages": {
+      "module": "INFRA",
+      "section": "INFRA_PACKAGE",
+      "role": "infra",
+      "level": "",
+      "type": "array",
+      "desc": "packages to be installed on infra nodes"
+    },
+    "infra_portal": {
+      "module": "INFRA",
+      "section": "INFRA_IDENTITY",
+      "role": "infra",
+      "level": "GLOBAL",
+      "type": "object",
+      "default": {
+        "home": {
+          "domain": "i.pigsty"
+        }
+      },
+      "impact": "reload",
+      "desc": "infra services exposed via portal",
+      "label": "门户服务",
+      "doc": "https://pigsty.io/docs/infra/param",
+      "items": {
+        "$ref": "#/defs/infra_portal_entry"
+      }
+    },
+    "infra_seq": {
+      "module": "INFRA",
+      "section": "INFRA_IDENTITY",
+      "role": "infra",
+      "level": "INSTANCE",
+      "type": "integer",
+      "identity": true,
+      "impact": "init-only",
+      "desc": "infra node identity, explicitly required"
+    },
+    "infra_services": {
+      "module": "INFRA",
+      "section": "INFRA_IDENTITY",
+      "role": "infra",
+      "level": "GLOBAL",
+      "type": "array",
+      "default": [
+        {
+          "desc": "VictoriaMetrics Query UI",
+          "desc_cn": "VictoriaMetrics 指标查询界面",
+          "icon": "metrics",
+          "name": "Metrics",
+          "name_cn": "指标查询",
+          "url": "/vmetrics/vmui/"
+        },
+        {
+          "desc": "VictoriaLogs Query UI",
+          "desc_cn": "VictoriaLogs 日志查询界面",
+          "icon": "logs",
+          "name": "Logs",
+          "name_cn": "日志查询",
+          "url": "/vlogs/select/vmui/"
+        },
+        {
+          "desc": "VictoriaTraces Query UI",
+          "desc_cn": "VictoriaTraces 链路查询界面",
+          "icon": "traces",
+          "name": "Traces",
+          "name_cn": "链路追踪",
+          "url": "/vtraces/select/vmui/"
+        },
+        {
+          "desc": "Prometheus Scrape Targets",
+          "desc_cn": "VictoriaMetrics 监控对象列表",
+          "icon": "target",
+          "name": "Monitor Targets",
+          "name_cn": "监控目标",
+          "url": "/vmetrics/targets"
+        },
+        {
+          "desc": "VMAlert alert/record Rules",
+          "desc_cn": "VMAlert 告警规则管理",
+          "icon": "alert",
+          "name": "Alert Rules",
+          "name_cn": "告警规则",
+          "url": "/vmalert/vmalert/groups"
+        },
+        {
+          "desc": "Alert Manage \u0026 Silence",
+          "desc_cn": "AlertManager 告警管理与屏蔽",
+          "icon": "alertmgr",
+          "name": "Alert Manager",
+          "name_cn": "告警管理",
+          "url": "/alertmgr/#/alerts"
+        },
+        {
+          "desc": "Self-Signed CA Certificate",
+          "desc_cn": "Pigsty 自签CA根证书",
+          "icon": "lock",
+          "name": "CA Certificate",
+          "name_cn": "CA 证书",
+          "url": "/ca.crt"
+        },
+        {
+          "desc": "Local YUM/APT Repository",
+          "desc_cn": "本地 YUM/APT 软件源",
+          "icon": "package",
+          "name": "Software Repo",
+          "name_cn": "软件仓库",
+          "url": "/pigsty"
+        },
+        {
+          "desc": "Postgres EXPLAIN Visualizer",
+          "desc_cn": "PG 执行计划可视化工具",
+          "icon": "search",
+          "name": "Explain Visualizer",
+          "name_cn": "执行计划",
+          "url": "/pev"
+        }
+      ],
+      "desc": "home page navigation entries",
+      "items": {
+        "$ref": "#/defs/infra_service_entry"
+      }
+    },
+    "juice_cache": {
+      "module": "OTHER",
+      "role": "juice",
+      "level": "",
+      "type": "string",
+      "desc": "cache directory (shared by all instances)"
+    },
+    "juice_instances": {
+      "module": "OTHER",
+      "role": "juice",
+      "level": "",
+      "type": "any",
+      "desc": "dict of juicefs filesystems"
+    },
+    "jupyter_data": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "string",
+      "default": "/data/jupyter",
+      "desc": "jupyter lab data directory"
+    },
+    "jupyter_enabled": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "jupyter disabled by default, enable in conf/vibe.yml"
+    },
+    "jupyter_password": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "string",
+      "default": "Vibe.Coding",
+      "desc": "jupyter lab access token"
+    },
+    "jupyter_port": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "integer",
+      "default": 8888,
+      "desc": "jupyter lab listen port"
+    },
+    "jupyter_venv": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "string",
+      "default": "/data/venv",
+      "desc": "python venv path with jupyter"
+    },
+    "kafka_cluster": {
+      "module": "KAFKA",
+      "section": "KAFKA",
+      "role": "kafka",
+      "level": "CLUSTER",
+      "type": "any",
+      "desc": "required cluster identity"
+    },
+    "kafka_cluster_id": {
+      "module": "KAFKA",
+      "section": "KAFKA",
+      "role": "kafka",
+      "level": "",
+      "type": "any",
+      "desc": "recovery/adoption only; random on bootstrap"
+    },
+    "kafka_controller_port": {
+      "module": "KAFKA",
+      "section": "KAFKA",
+      "role": "kafka",
+      "level": "",
+      "type": "integer",
+      "default": 9093,
+      "desc": "default kraft controller listener port"
+    },
+    "kafka_data": {
+      "module": "KAFKA",
+      "section": "KAFKA",
+      "role": "kafka",
+      "level": "",
+      "type": "string",
+      "default": "/data/kafka",
+      "desc": "required data directory; must be persistent and writable"
+    },
+    "kafka_exporter_port": {
+      "module": "KAFKA",
+      "section": "KAFKA",
+      "role": "kafka",
+      "level": "",
+      "type": "integer",
+      "default": 9308,
+      "desc": "default kafka_exporter port"
+    },
+    "kafka_heap_opts": {
+      "module": "KAFKA",
+      "section": "KAFKA",
+      "role": "kafka",
+      "level": "",
+      "type": "string",
+      "default": "-Xms1G -Xmx1G"
+    },
+    "kafka_jmx_exporter_port": {
+      "module": "KAFKA",
+      "section": "KAFKA",
+      "role": "kafka",
+      "level": "",
+      "type": "integer",
+      "default": 9404,
+      "desc": "default jmx exporter port"
+    },
+    "kafka_parameters": {
+      "module": "KAFKA",
+      "section": "KAFKA",
+      "role": "kafka",
+      "level": "",
+      "type": "object",
+      "default": {}
+    },
+    "kafka_port": {
+      "module": "KAFKA",
+      "section": "KAFKA",
+      "role": "kafka",
+      "level": "",
+      "type": "integer",
+      "default": 9092,
+      "desc": "default kafka broker listener port"
+    },
+    "kafka_rm_data": {
+      "module": "KAFKA",
+      "section": "KAFKA_REMOVE",
+      "role": "kafka_remove",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "remove kafka data dir \u0026 /etc/kafka recovery state?"
+    },
+    "kafka_rm_pkg": {
+      "module": "KAFKA",
+      "section": "KAFKA_REMOVE",
+      "role": "kafka_remove",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "uninstall kafka \u0026 kafka-exporter packages?"
+    },
+    "kafka_role": {
+      "module": "KAFKA",
+      "section": "KAFKA",
+      "role": "kafka",
+      "level": "INSTANCE",
+      "type": "string",
+      "default": "combined",
+      "desc": "combined | broker | controller"
+    },
+    "kafka_safeguard": {
+      "module": "KAFKA",
+      "section": "KAFKA_REMOVE",
+      "role": "kafka_remove",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "prevent purging a running kafka cluster?"
+    },
+    "kafka_security": {
+      "module": "KAFKA",
+      "section": "KAFKA",
+      "role": "kafka",
+      "level": "",
+      "type": "string",
+      "default": "plaintext",
+      "desc": "plaintext | scram"
+    },
+    "kafka_seq": {
+      "module": "KAFKA",
+      "section": "KAFKA",
+      "role": "kafka",
+      "level": "INSTANCE",
+      "type": "integer",
+      "desc": "required, unique KRaft node.id"
+    },
+    "kafka_topics": {
+      "module": "KAFKA",
+      "section": "KAFKA",
+      "role": "kafka",
+      "level": "",
+      "type": "array",
+      "default": []
+    },
+    "kafka_users": {
+      "module": "KAFKA",
+      "section": "KAFKA",
+      "role": "kafka",
+      "level": "",
+      "type": "array",
+      "default": []
+    },
+    "language": {
+      "module": "INFRA",
+      "section": "INFRA_META",
+      "role": "infra",
+      "level": "GLOBAL",
+      "type": "string",
+      "default": "en",
+      "enum": [
+        "en",
+        "zh"
+      ],
+      "desc": "default language, en by default, could be zh"
+    },
+    "link_map": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "object",
+      "desc": "Tablespace link mappings"
+    },
+    "lsn": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "string",
+      "desc": "Recovery target: log sequence number, exclusive with time, name, xid"
+    },
+    "meta": {
+      "module": "OTHER",
+      "role": "juice",
+      "level": "",
+      "type": "string",
+      "desc": "[REQUIRED] metadata engine URL"
+    },
+    "minio_access_key": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "string",
+      "default": "minioadmin",
+      "desc": "root access key, `minioadmin` by default"
+    },
+    "minio_admin_port": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "integer",
+      "default": 9001,
+      "desc": "minio console port, 9001 by default"
+    },
+    "minio_alias": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "string",
+      "default": "sss",
+      "desc": "alias name for local minio deployment"
+    },
+    "minio_buckets": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "array",
+      "default": [
+        {
+          "name": "pgsql"
+        },
+        {
+          "name": "meta",
+          "versioning": true
+        },
+        {
+          "name": "data"
+        }
+      ],
+      "desc": "list of minio bucket to be created"
+    },
+    "minio_cluster": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "CLUSTER",
+      "type": "string",
+      "identity": true,
+      "impact": "init-only",
+      "desc": "minio cluster identifier, REQUIRED"
+    },
+    "minio_data": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "string",
+      "default": "/data/minio",
+      "desc": "minio data dir(s), use {x...y} to specify multi drivers"
+    },
+    "minio_domain": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "string",
+      "default": "sss.pigsty",
+      "desc": "minio external domain name, `sss.pigsty` by default"
+    },
+    "minio_endpoint": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "string",
+      "desc": "if not specified, overwritten by defaults"
+    },
+    "minio_extra_vars": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "extra environment variables"
+    },
+    "minio_https": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "use https for minio, true by default"
+    },
+    "minio_node": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "string",
+      "default": "${minio_cluster}-${minio_seq}.pigsty",
+      "desc": "minio node name pattern"
+    },
+    "minio_port": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "integer",
+      "default": 9000,
+      "desc": "minio service port, 9000 by default"
+    },
+    "minio_provision": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "run minio provisioning tasks?"
+    },
+    "minio_rm_data": {
+      "module": "MINIO",
+      "section": "MINIO_REMOVE",
+      "role": "minio_remove",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "purging minio data and config? true by default"
+    },
+    "minio_rm_pkg": {
+      "module": "MINIO",
+      "section": "MINIO_REMOVE",
+      "role": "minio_remove",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "uninstall Silo and mcli packages? false by default"
+    },
+    "minio_safeguard": {
+      "module": "MINIO",
+      "section": "MINIO_REMOVE",
+      "role": "minio_remove",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "prevents purging minio instance? false by default"
+    },
+    "minio_secret_key": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "string",
+      "default": "S3User.MinIO",
+      "desc": "root secret key, `S3User.MinIO` by default"
+    },
+    "minio_seq": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "INSTANCE",
+      "type": "integer",
+      "identity": true,
+      "impact": "init-only",
+      "desc": "minio instance identifier, REQUIRED"
+    },
+    "minio_type": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "silo",
+      "enum": [
+        "silo"
+      ],
+      "desc": "reserved engine selector, only silo is accepted"
+    },
+    "minio_user": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "string",
+      "default": "minio",
+      "desc": "minio os user, `minio` by default"
+    },
+    "minio_users": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "array",
+      "default": [
+        {
+          "access_key": "pgbackrest",
+          "policy": "pgsql",
+          "secret_key": "S3User.Backup"
+        },
+        {
+          "access_key": "s3user_meta",
+          "policy": "meta",
+          "secret_key": "S3User.Meta"
+        },
+        {
+          "access_key": "s3user_data",
+          "policy": "data",
+          "secret_key": "S3User.Data"
+        }
+      ],
+      "desc": "list of minio user to be created"
+    },
+    "minio_volumes": {
+      "module": "MINIO",
+      "section": "SILO",
+      "role": "minio",
+      "level": "",
+      "type": "any",
+      "desc": "minio data volumes, override defaults if specified"
+    },
+    "mode": {
+      "module": "OTHER",
+      "role": "juice",
+      "level": "",
+      "type": "string",
+      "desc": "mountpoint mode, default: 0755"
+    },
+    "mount": {
+      "module": "OTHER",
+      "role": "juice",
+      "level": "",
+      "type": "string",
+      "desc": "extra mount options, default empty"
+    },
+    "mysql_backup_enabled": {
+      "module": "MYSQL",
+      "section": "MYSQL_BACKUP",
+      "role": "mysql",
+      "level": "",
+      "type": "boolean",
+      "default": true
+    },
+    "mysql_backup_repo": {
+      "module": "MYSQL",
+      "section": "MYSQL_BACKUP",
+      "role": "mysql",
+      "level": "",
+      "type": "object",
+      "default": {
+        "local": {
+          "path": "/data/backups/mysql",
+          "retention": 7
+        }
+      }
+    },
+    "mysql_cluster": {
+      "module": "MYSQL",
+      "section": "MYSQL_IDENTITY",
+      "role": "mysql",
+      "level": "CLUSTER",
+      "type": "any",
+      "desc": "required cluster name"
+    },
+    "mysql_cluster_password": {
+      "module": "MYSQL",
+      "section": "MYSQL_BUSINESS",
+      "role": "mysql",
+      "level": "",
+      "type": "string",
+      "default": "DBUser.Cluster"
+    },
+    "mysql_databases": {
+      "module": "MYSQL",
+      "section": "MYSQL_BUSINESS",
+      "role": "mysql",
+      "level": "",
+      "type": "array",
+      "default": [],
+      "desc": "[{ name, encoding, collate }]"
+    },
+    "mysql_exporter_enabled": {
+      "module": "MYSQL",
+      "section": "MYSQL_MONITOR",
+      "role": "mysql",
+      "level": "",
+      "type": "boolean",
+      "default": true
+    },
+    "mysql_monitor_password": {
+      "module": "MYSQL",
+      "section": "MYSQL_BUSINESS",
+      "role": "mysql",
+      "level": "",
+      "type": "string",
+      "default": "DBUser.Monitor"
+    },
+    "mysql_parameters": {
+      "module": "MYSQL",
+      "section": "MYSQL_BUSINESS",
+      "role": "mysql",
+      "level": "",
+      "type": "object",
+      "default": {},
+      "desc": "extra [mysqld] options, e.g. { max_connections: 500 }"
+    },
+    "mysql_rm_confirm": {
+      "module": "MYSQL",
+      "section": "MYSQL_REMOVE",
+      "role": "mysql_remove",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "exact mysql instance or cluster name"
+    },
+    "mysql_root_password": {
+      "module": "MYSQL",
+      "section": "MYSQL_BUSINESS",
+      "role": "mysql",
+      "level": "",
+      "type": "string",
+      "default": "DBUser.Root"
+    },
+    "mysql_safeguard": {
+      "module": "MYSQL",
+      "section": "MYSQL_REMOVE",
+      "role": "mysql_remove",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "abort mysql_remove unless explicitly false"
+    },
+    "mysql_seq": {
+      "module": "MYSQL",
+      "section": "MYSQL_IDENTITY",
+      "role": "mysql",
+      "level": "INSTANCE",
+      "type": "integer",
+      "desc": "{1} for standalone, {1,2,3} for MGR"
+    },
+    "mysql_users": {
+      "module": "MYSQL",
+      "section": "MYSQL_BUSINESS",
+      "role": "mysql",
+      "level": "",
+      "type": "array",
+      "default": [],
+      "desc": "[{ name, host, password, connlimit, priv }]"
+    },
+    "name": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "string",
+      "desc": "Recovery target: named restore point, exclusive with time, xid, lsn"
+    },
+    "nginx_cert_exists": {
+      "module": "INFRA",
+      "section": "INTERNAL",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": false
+    },
+    "nginx_cert_validity": {
+      "module": "INFRA",
+      "section": "NGINX",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "397d",
+      "desc": "nginx self-signed cert validity, 397d by default"
+    },
+    "nginx_clean": {
+      "module": "INFRA",
+      "section": "NGINX",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "clean existing nginx config during init?"
+    },
+    "nginx_data": {
+      "module": "INFRA",
+      "section": "NGINX",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "/data/nginx",
+      "desc": "nginx actual data dir, /data/nginx by default"
+    },
+    "nginx_enabled": {
+      "module": "INFRA",
+      "section": "NGINX",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable nginx on this infra node?"
+    },
+    "nginx_exporter_enabled": {
+      "module": "INFRA",
+      "section": "NGINX",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable nginx_exporter on this infra node?"
+    },
+    "nginx_exporter_port": {
+      "module": "INFRA",
+      "section": "NGINX",
+      "role": "infra",
+      "level": "",
+      "type": "integer",
+      "default": 9113,
+      "desc": "nginx_exporter listen port, 9113 by default"
+    },
+    "nginx_home": {
+      "module": "INFRA",
+      "section": "NGINX",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "/www",
+      "desc": "nginx content dir, `/www` by default (soft link to nginx_data)"
+    },
+    "nginx_port": {
+      "module": "INFRA",
+      "section": "NGINX",
+      "role": "infra",
+      "level": "",
+      "type": "integer",
+      "default": 80,
+      "desc": "nginx listen port, 80 by default"
+    },
+    "nginx_ssl_port": {
+      "module": "INFRA",
+      "section": "NGINX",
+      "role": "infra",
+      "level": "",
+      "type": "integer",
+      "default": 443,
+      "desc": "nginx ssl listen port, 443 by default"
+    },
+    "nginx_sslmode": {
+      "module": "INFRA",
+      "section": "NGINX",
+      "role": "infra",
+      "level": "GLOBAL",
+      "type": "string",
+      "default": "enable",
+      "enum": [
+        "disable",
+        "enable",
+        "enforce"
+      ],
+      "desc": "nginx ssl mode? disable,enable,enforce"
+    },
+    "nginx_users": {
+      "module": "INFRA",
+      "section": "NGINX",
+      "role": "infra",
+      "level": "",
+      "type": "object",
+      "default": {},
+      "desc": "nginx basic auth users: name and pass dict"
+    },
+    "node_admin_enabled": {
+      "module": "NODE",
+      "section": "NODE_ADMIN",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "create a admin user on target node?"
+    },
+    "node_admin_pk_current": {
+      "module": "NODE",
+      "section": "NODE_ADMIN",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "add current user's ssh pk to admin authorized_keys"
+    },
+    "node_admin_pk_list": {
+      "module": "NODE",
+      "section": "NODE_ADMIN",
+      "role": "node",
+      "level": "CLUSTER",
+      "type": "array",
+      "default": [],
+      "desc": "ssh public keys to be added to admin user",
+      "items": {
+        "type": "string"
+      }
+    },
+    "node_admin_ssh_exchange": {
+      "module": "NODE",
+      "section": "NODE_ADMIN",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "exchange admin ssh key among node cluster"
+    },
+    "node_admin_sudo": {
+      "module": "NODE",
+      "section": "NODE_ADMIN",
+      "role": "node",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "nopass",
+      "enum": [
+        "all",
+        "nopass"
+      ],
+      "desc": "admin sudo privilege, all,nopass. nopass by default"
+    },
+    "node_admin_uid": {
+      "module": "NODE",
+      "section": "NODE_ADMIN",
+      "role": "node",
+      "level": "",
+      "type": "integer",
+      "default": 88,
+      "desc": "uid and gid for node admin user"
+    },
+    "node_admin_username": {
+      "module": "NODE",
+      "section": "NODE_ADMIN",
+      "role": "node",
+      "level": "",
+      "type": "string",
+      "default": "dba",
+      "desc": "name of node admin user, `dba` by default"
+    },
+    "node_aliases": {
+      "module": "NODE",
+      "section": "NODE_ADMIN",
+      "role": "node",
+      "level": "",
+      "type": "object",
+      "default": {},
+      "desc": "extra shell aliases to be added, k:v dict"
+    },
+    "node_cluster": {
+      "module": "NODE",
+      "section": "NODE_IDENTITY",
+      "role": "node",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "nodes",
+      "impact": "init-only",
+      "desc": "node cluster identity, use 'nodes' if missing, optional"
+    },
+    "node_crontab": {
+      "module": "NODE",
+      "section": "NODE_TIME",
+      "role": "node",
+      "level": "",
+      "type": "array",
+      "default": [],
+      "desc": "crontab entries in `/etc/crontab`"
+    },
+    "node_crontab_overwrite": {
+      "module": "NODE",
+      "section": "NODE_TIME",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "overwrite or append to `/etc/crontab`?"
+    },
+    "node_data": {
+      "module": "NODE",
+      "section": "NODE_ADMIN",
+      "role": "node",
+      "level": "",
+      "type": "string",
+      "default": "/data",
+      "desc": "node main data directory, `/data` by default"
+    },
+    "node_default_etc_hosts": {
+      "module": "NODE",
+      "section": "NODE_DNS",
+      "role": "node",
+      "level": "",
+      "type": "array",
+      "default": [
+        "${admin_ip} i.pigsty"
+      ],
+      "desc": "static dns records in `/etc/hosts`"
+    },
+    "node_default_packages": {
+      "module": "NODE",
+      "section": "NODE_PACKAGE",
+      "role": "node",
+      "level": "",
+      "type": "array",
+      "desc": "default packages to be installed on infra nodes"
+    },
+    "node_disable_numa": {
+      "module": "NODE",
+      "section": "NODE_TUNE",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "disable node numa, reboot required"
+    },
+    "node_disable_swap": {
+      "module": "NODE",
+      "section": "NODE_TUNE",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "disable node swap, use with caution"
+    },
+    "node_disk_prefetch": {
+      "module": "NODE",
+      "section": "NODE_TUNE",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "setup disk prefetch on HDD to increase performance"
+    },
+    "node_dns_method": {
+      "module": "NODE",
+      "section": "NODE_DNS",
+      "role": "node",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "add",
+      "enum": [
+        "add",
+        "none",
+        "overwrite"
+      ],
+      "desc": "how to handle dns servers: add,none,overwrite"
+    },
+    "node_dns_options": {
+      "module": "NODE",
+      "section": "NODE_DNS",
+      "role": "node",
+      "level": "",
+      "type": "array",
+      "default": [
+        "options single-request-reopen timeout:1"
+      ],
+      "desc": "dns resolv options in `/etc/resolv.conf`"
+    },
+    "node_dns_servers": {
+      "module": "NODE",
+      "section": "NODE_DNS",
+      "role": "node",
+      "level": "",
+      "type": "array",
+      "default": [
+        "${admin_ip}"
+      ],
+      "desc": "dynamic nameserver in `/etc/resolv.conf`"
+    },
+    "node_etc_hosts": {
+      "module": "NODE",
+      "section": "NODE_DNS",
+      "role": "node",
+      "level": "CLUSTER",
+      "type": "array",
+      "default": [],
+      "desc": "extra static dns records in `/etc/hosts`",
+      "items": {
+        "type": "string"
+      }
+    },
+    "node_exporter_enabled": {
+      "module": "NODE",
+      "role": "node_monitor",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "setup node_exporter on this node?"
+    },
+    "node_exporter_options": {
+      "module": "NODE",
+      "role": "node_monitor",
+      "level": "",
+      "type": "string",
+      "default": "--no-collector.softnet --no-collector.nvme --collector.tcpstat --collector.processes"
+    },
+    "node_exporter_port": {
+      "module": "NODE",
+      "role": "node_monitor",
+      "level": "",
+      "type": "integer",
+      "default": 9100,
+      "desc": "node exporter listen port, 9100 by default"
+    },
+    "node_firewall_intranet": {
+      "module": "NODE",
+      "section": "NODE_SEC",
+      "role": "node",
+      "level": "",
+      "type": "array",
+      "default": [
+        "10.0.0.0/8",
+        "192.168.0.0/16",
+        "172.16.0.0/12"
+      ],
+      "desc": "which intranet cidr considered as internal network"
+    },
+    "node_firewall_mode": {
+      "module": "NODE",
+      "section": "NODE_SEC",
+      "role": "node",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "zone",
+      "enum": [
+        "zone",
+        "off",
+        "none"
+      ],
+      "desc": "firewall mode: zone (default), off (disable), none (skip \u0026 self-managed)"
+    },
+    "node_firewall_public_port": {
+      "module": "NODE",
+      "section": "NODE_SEC",
+      "role": "node",
+      "level": "CLUSTER",
+      "type": "array",
+      "default": [
+        22,
+        80,
+        443
+      ],
+      "desc": "expose these ports to public network in (zone, strict) mode",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "node_hugepage_count": {
+      "module": "NODE",
+      "section": "NODE_TUNE",
+      "role": "node",
+      "level": "",
+      "type": "integer",
+      "default": 0,
+      "desc": "number of 2MB hugepage, take precedence over ratio"
+    },
+    "node_hugepage_ratio": {
+      "module": "NODE",
+      "section": "NODE_TUNE",
+      "role": "node",
+      "level": "",
+      "type": "integer",
+      "default": 0,
+      "desc": "node mem hugepage ratio, 0 disable it by default"
+    },
+    "node_id_from_pg": {
+      "module": "NODE",
+      "section": "NODE_IDENTITY",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "use postgres identity as node identity if applicable?"
+    },
+    "node_kernel_modules": {
+      "module": "NODE",
+      "section": "NODE_TUNE",
+      "role": "node",
+      "level": "",
+      "type": "array",
+      "default": [
+        "softdog",
+        "ip_vs",
+        "ip_vs_rr",
+        "ip_vs_wrr",
+        "ip_vs_sh"
+      ],
+      "desc": "br_netfilter toa"
+    },
+    "node_ntp_enabled": {
+      "module": "NODE",
+      "section": "NODE_TIME",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable chronyd time sync service?"
+    },
+    "node_ntp_servers": {
+      "module": "NODE",
+      "section": "NODE_TIME",
+      "role": "node",
+      "level": "",
+      "type": "array",
+      "default": [
+        "pool pool.ntp.org iburst"
+      ],
+      "desc": "ntp servers in chrony config"
+    },
+    "node_overcommit_ratio": {
+      "module": "NODE",
+      "section": "NODE_TUNE",
+      "role": "node",
+      "level": "",
+      "type": "integer",
+      "default": 0,
+      "desc": "node mem overcommit ratio, 0 disable it by default"
+    },
+    "node_packages": {
+      "module": "NODE",
+      "section": "NODE_PACKAGE",
+      "role": "node",
+      "level": "",
+      "type": "array",
+      "default": [
+        "openssh-server"
+      ],
+      "desc": "packages to be installed current nodes with latest version"
+    },
+    "node_pip_packages": {
+      "module": "NODE",
+      "section": "NODE_PACKAGE",
+      "role": "node",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "pip packages to be installed in uv venv"
+    },
+    "node_repo_modules": {
+      "module": "NODE",
+      "section": "NODE_PACKAGE",
+      "role": "node",
+      "level": "",
+      "type": "string",
+      "default": "local",
+      "desc": "upstream repo to be added on node, local by default"
+    },
+    "node_repo_remove": {
+      "module": "NODE",
+      "section": "NODE_PACKAGE",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "remove existing repo on node?"
+    },
+    "node_selinux_mode": {
+      "module": "NODE",
+      "section": "NODE_SEC",
+      "role": "node",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "permissive",
+      "enum": [
+        "enforcing",
+        "permissive",
+        "disabled"
+      ],
+      "desc": "set selinux mode: enforcing,permissive,disabled"
+    },
+    "node_static_network": {
+      "module": "NODE",
+      "section": "NODE_TUNE",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "preserve dns resolver settings after reboot"
+    },
+    "node_sysctl_params": {
+      "module": "NODE",
+      "section": "NODE_TUNE",
+      "role": "node",
+      "level": "",
+      "type": "object",
+      "default": {
+        "fs.nr_open": 8388608
+      },
+      "desc": "sysctl parameters in k:v format in addition to tuned"
+    },
+    "node_timezone": {
+      "module": "NODE",
+      "section": "NODE_TIME",
+      "role": "node",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "setup node timezone, empty string to skip"
+    },
+    "node_tune": {
+      "module": "NODE",
+      "section": "NODE_TUNE",
+      "role": "node",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "oltp",
+      "enum": [
+        "none",
+        "oltp",
+        "olap",
+        "crit",
+        "tiny"
+      ],
+      "impact": "playbook",
+      "desc": "node tuned profile: none,oltp,olap,crit,tiny",
+      "label": "节点调优模板",
+      "doc": "https://pigsty.io/docs/node/param"
+    },
+    "node_tuned_profile_dir": {
+      "module": "NODE",
+      "section": "NODE_TUNE",
+      "role": "node",
+      "level": "",
+      "type": "string",
+      "default": "/etc/tuned",
+      "desc": "node tuned profile directory"
+    },
+    "node_uv_env": {
+      "module": "NODE",
+      "section": "NODE_PACKAGE",
+      "role": "node",
+      "level": "",
+      "type": "string",
+      "default": "/data/venv",
+      "desc": "uv venv path, /data/venv by default, empty to skip"
+    },
+    "node_write_etc_hosts": {
+      "module": "MINIO",
+      "section": "NODE_DNS",
+      "role": "minio",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "modify `/etc/hosts` on target node?"
+    },
+    "nodejs_enabled": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "install standalone nodejs runtime task (agents install it on demand)"
+    },
+    "nodejs_registry": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "npm registry, auto china mirror if empty"
+    },
+    "nodename": {
+      "module": "NODE",
+      "section": "NODE_IDENTITY",
+      "role": "node",
+      "level": "INSTANCE",
+      "type": "string",
+      "identity": true,
+      "impact": "init-only",
+      "desc": "node instance identity, use hostname if missing, optional"
+    },
+    "nodename_exchange": {
+      "module": "NODE",
+      "section": "NODE_IDENTITY",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "exchange nodename among play hosts?"
+    },
+    "nodename_overwrite": {
+      "module": "NODE",
+      "section": "NODE_IDENTITY",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "overwrite node's hostname with nodename?"
+    },
+    "npm_packages": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "array",
+      "default": [],
+      "desc": "optional extra global npm packages"
+    },
+    "owner": {
+      "module": "OTHER",
+      "role": "juice",
+      "level": "",
+      "type": "string",
+      "desc": "mountpoint owner, default: root"
+    },
+    "path": {
+      "module": "OTHER",
+      "role": "juice",
+      "level": "",
+      "type": "string",
+      "desc": "[REQUIRED] mountpoint path"
+    },
+    "patroni_enabled": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "if disabled, no postgres cluster will be created during init"
+    },
+    "patroni_log_dir": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "/pg/log/patroni",
+      "desc": "patroni log dir, `/pg/log/patroni` by default"
+    },
+    "patroni_mode": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "default",
+      "enum": [
+        "default",
+        "pause",
+        "remove"
+      ],
+      "desc": "patroni working mode: default,pause,remove"
+    },
+    "patroni_password": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "Patroni.API",
+      "desc": "patroni restapi password, `Patroni.API` by default"
+    },
+    "patroni_port": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "integer",
+      "default": 8008,
+      "desc": "patroni listen port, 8008 by default"
+    },
+    "patroni_ssl_enabled": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "secure patroni RestAPI communications with SSL?"
+    },
+    "patroni_username": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "postgres",
+      "desc": "patroni restapi username, `postgres` by default"
+    },
+    "patroni_watchdog_mode": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "off",
+      "desc": "patroni watchdog mode: automatic,required,off. off by default"
+    },
+    "pg_admin_password": {
+      "module": "PGSQL",
+      "section": "PG_BUSINESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "DBUser.DBA"
+    },
+    "pg_admin_username": {
+      "module": "PGSQL",
+      "section": "PG_BUSINESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "dbuser_dba"
+    },
+    "pg_bin_dir": {
+      "module": "PGSQL",
+      "section": "PG_INSTALL",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "/usr/pgsql/bin",
+      "desc": "postgres binary dir, `/usr/pgsql/bin` by default"
+    },
+    "pg_checksum": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable data checksum for postgres cluster?"
+    },
+    "pg_cluster": {
+      "module": "PGSQL",
+      "section": "PG_IDENTITY",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "string",
+      "identity": true,
+      "impact": "init-only",
+      "desc": "pgsql cluster name, required identity parameter",
+      "label": "PG 集群名"
+    },
+    "pg_conf": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "oltp.yml",
+      "enum": [
+        "oltp.yml",
+        "olap.yml",
+        "crit.yml",
+        "tiny.yml"
+      ],
+      "impact": "restart",
+      "desc": "config template: oltp,olap,crit,tiny. `oltp.yml` by default",
+      "label": "PG 调优模板",
+      "doc": "https://pigsty.io/docs/pgsql/param"
+    },
+    "pg_crontab": {
+      "module": "PGSQL",
+      "section": "PG_BUSINESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "array",
+      "default": [],
+      "desc": "postgres crontab entries, e.g: ['00 01 * * * /pg/bin/pg-backup full']"
+    },
+    "pg_data": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "/pg/data",
+      "desc": "postgres data directory, `/pg/data` by default"
+    },
+    "pg_databases": {
+      "module": "PGSQL",
+      "section": "PG_BUSINESS",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "array",
+      "default": [],
+      "impact": "action:pgsql-db",
+      "desc": "postgres business databases",
+      "label": "业务数据库",
+      "doc": "https://pigsty.io/docs/pgsql/config/db",
+      "items": {
+        "$ref": "#/defs/pg_database"
+      }
+    },
+    "pg_dbsu": {
+      "module": "PGSQL",
+      "section": "PG_INSTALL",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "postgres",
+      "desc": "os dbsu name, postgres by default, better not to change it"
+    },
+    "pg_dbsu_home": {
+      "module": "PGSQL",
+      "section": "PG_INSTALL",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "/var/lib/pgsql",
+      "desc": "postgresql home directory, `/var/lib/pgsql` by default"
+    },
+    "pg_dbsu_password": {
+      "module": "PGSQL",
+      "section": "PG_BUSINESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "dbsu password, empty string means no dbsu password by default"
+    },
+    "pg_dbsu_ssh_exchange": {
+      "module": "PGSQL",
+      "section": "PG_INSTALL",
+      "role": "pgsql",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "exchange postgres dbsu ssh key among the same pgsql cluster"
+    },
+    "pg_dbsu_sudo": {
+      "module": "PGSQL",
+      "section": "PG_INSTALL",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "limit",
+      "enum": [
+        "none",
+        "limit",
+        "all",
+        "nopass"
+      ],
+      "desc": "dbsu sudo privilege, none,limit,all,nopass. limit by default"
+    },
+    "pg_dbsu_uid": {
+      "module": "PGSQL",
+      "section": "PG_INSTALL",
+      "role": "pgsql",
+      "level": "",
+      "type": "integer",
+      "default": 26,
+      "desc": "os dbsu uid and gid, 26 for default postgres users and groups"
+    },
+    "pg_default_extensions": {
+      "module": "PGSQL",
+      "section": "PG_PROVISION",
+      "role": "pgsql",
+      "level": "",
+      "type": "array",
+      "default": [
+        {
+          "name": "pg_stat_statements",
+          "schema": "monitor"
+        },
+        {
+          "name": "pgstattuple",
+          "schema": "monitor"
+        },
+        {
+          "name": "pg_buffercache",
+          "schema": "monitor"
+        },
+        {
+          "name": "pageinspect",
+          "schema": "monitor"
+        },
+        {
+          "name": "pg_prewarm",
+          "schema": "monitor"
+        },
+        {
+          "name": "pg_visibility",
+          "schema": "monitor"
+        },
+        {
+          "name": "pg_freespacemap",
+          "schema": "monitor"
+        },
+        {
+          "name": "postgres_fdw",
+          "schema": "public"
+        },
+        {
+          "name": "file_fdw",
+          "schema": "public"
+        },
+        {
+          "name": "btree_gist",
+          "schema": "public"
+        },
+        {
+          "name": "btree_gin",
+          "schema": "public"
+        },
+        {
+          "name": "pg_trgm",
+          "schema": "public"
+        },
+        {
+          "name": "intagg",
+          "schema": "public"
+        },
+        {
+          "name": "intarray",
+          "schema": "public"
+        },
+        {
+          "name": "pg_repack"
+        }
+      ],
+      "desc": "default extensions to be created"
+    },
+    "pg_default_hba_rules": {
+      "module": "PGSQL",
+      "section": "PG_PROVISION",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "array",
+      "default": [
+        {
+          "addr": "local",
+          "auth": "ident",
+          "db": "all",
+          "order": 100,
+          "title": "dbsu access via local os user ident",
+          "user": "${dbsu}"
+        },
+        {
+          "addr": "local",
+          "auth": "ident",
+          "db": "replication",
+          "order": 150,
+          "title": "dbsu replication from local os ident",
+          "user": "${dbsu}"
+        },
+        {
+          "addr": "localhost",
+          "auth": "pwd",
+          "db": "replication",
+          "order": 200,
+          "title": "replicator replication from localhost",
+          "user": "${repl}"
+        },
+        {
+          "addr": "intra",
+          "auth": "pwd",
+          "db": "replication",
+          "order": 250,
+          "title": "replicator replication from intranet",
+          "user": "${repl}"
+        },
+        {
+          "addr": "intra",
+          "auth": "pwd",
+          "db": "postgres",
+          "order": 300,
+          "title": "replicator postgres db from intranet",
+          "user": "${repl}"
+        },
+        {
+          "addr": "localhost",
+          "auth": "pwd",
+          "db": "all",
+          "order": 350,
+          "title": "monitor from localhost with password",
+          "user": "${monitor}"
+        },
+        {
+          "addr": "infra",
+          "auth": "pwd",
+          "db": "all",
+          "order": 400,
+          "title": "monitor from infra host with password",
+          "user": "${monitor}"
+        },
+        {
+          "addr": "intra",
+          "auth": "pwd",
+          "db": "all",
+          "order": 450,
+          "title": "admin @ intranet nodes with pwd",
+          "user": "${admin}"
+        },
+        {
+          "addr": "world",
+          "auth": "ssl",
+          "db": "all",
+          "order": 500,
+          "title": "admin @ everywhere with ssl \u0026 pwd",
+          "user": "${admin}"
+        },
+        {
+          "addr": "localhost",
+          "auth": "pwd",
+          "db": "all",
+          "order": 550,
+          "title": "pgbouncer read/write via local socket",
+          "user": "+dbrole_readonly"
+        },
+        {
+          "addr": "intra",
+          "auth": "pwd",
+          "db": "all",
+          "order": 600,
+          "title": "read/write biz user via password",
+          "user": "+dbrole_readonly"
+        },
+        {
+          "addr": "intra",
+          "auth": "pwd",
+          "db": "all",
+          "order": 650,
+          "title": "allow etl offline tasks from intranet",
+          "user": "+dbrole_offline"
+        }
+      ],
+      "desc": "postgres default host-based authentication rules, order by `order`",
+      "doc": "https://pigsty.io/docs/pgsql/config/hba",
+      "items": {
+        "$ref": "#/defs/hba_rule"
+      }
+    },
+    "pg_default_privileges": {
+      "module": "PGSQL",
+      "section": "PG_PROVISION",
+      "role": "pgsql",
+      "level": "",
+      "type": "array",
+      "default": [
+        "GRANT USAGE      ON SCHEMAS    TO  dbrole_readonly",
+        "GRANT SELECT     ON TABLES     TO  dbrole_readonly",
+        "GRANT SELECT     ON SEQUENCES  TO  dbrole_readonly",
+        "GRANT EXECUTE    ON FUNCTIONS  TO  dbrole_readonly",
+        "GRANT USAGE      ON SCHEMAS    TO  dbrole_offline",
+        "GRANT SELECT     ON TABLES     TO  dbrole_offline",
+        "GRANT SELECT     ON SEQUENCES  TO  dbrole_offline",
+        "GRANT EXECUTE    ON FUNCTIONS  TO  dbrole_offline",
+        "GRANT INSERT     ON TABLES     TO  dbrole_readwrite",
+        "GRANT UPDATE     ON TABLES     TO  dbrole_readwrite",
+        "GRANT DELETE     ON TABLES     TO  dbrole_readwrite",
+        "GRANT USAGE      ON SEQUENCES  TO  dbrole_readwrite",
+        "GRANT UPDATE     ON SEQUENCES  TO  dbrole_readwrite",
+        "GRANT TRUNCATE   ON TABLES     TO  dbrole_admin",
+        "GRANT REFERENCES ON TABLES     TO  dbrole_admin",
+        "GRANT TRIGGER    ON TABLES     TO  dbrole_admin",
+        "GRANT CREATE     ON SCHEMAS    TO  dbrole_admin"
+      ],
+      "desc": "default privileges when created by admin user"
+    },
+    "pg_default_roles": {
+      "module": "PGSQL",
+      "section": "PG_PROVISION",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "array",
+      "default": [
+        {
+          "comment": "role for global read-only access",
+          "login": false,
+          "name": "dbrole_readonly"
+        },
+        {
+          "comment": "role for restricted read-only access",
+          "login": false,
+          "name": "dbrole_offline"
+        },
+        {
+          "comment": "role for global read-write access",
+          "login": false,
+          "name": "dbrole_readwrite",
+          "roles": [
+            "dbrole_readonly"
+          ]
+        },
+        {
+          "comment": "role for object creation",
+          "login": false,
+          "name": "dbrole_admin",
+          "roles": [
+            "pg_monitor",
+            "dbrole_readwrite"
+          ]
+        },
+        {
+          "comment": "system superuser",
+          "name": "postgres",
+          "superuser": true
+        },
+        {
+          "comment": "system replicator",
+          "name": "replicator",
+          "replication": true,
+          "roles": [
+            "pg_monitor",
+            "dbrole_readonly"
+          ]
+        },
+        {
+          "comment": "pgsql admin user",
+          "name": "dbuser_dba",
+          "pgbouncer": true,
+          "pool_connlimit": 16,
+          "pool_mode": "session",
+          "roles": [
+            "dbrole_admin"
+          ],
+          "superuser": true
+        },
+        {
+          "comment": "pgsql monitor user",
+          "name": "dbuser_monitor",
+          "parameters": {
+            "log_min_duration_statement": 1000
+          },
+          "pgbouncer": true,
+          "pool_connlimit": 8,
+          "pool_mode": "session",
+          "roles": [
+            "pg_monitor",
+            "dbrole_readonly"
+          ]
+        }
+      ],
+      "desc": "default roles and users in postgres cluster",
+      "doc": "https://pigsty.io/docs/pgsql/config/user",
+      "items": {
+        "$ref": "#/defs/pg_user"
+      }
+    },
+    "pg_default_schemas": {
+      "module": "PGSQL",
+      "section": "PG_PROVISION",
+      "role": "pgsql",
+      "level": "",
+      "type": "array",
+      "default": [
+        "monitor"
+      ],
+      "desc": "default schemas to be created"
+    },
+    "pg_default_service_dest": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "pgbouncer",
+      "desc": "default service destination if svc.dest='default'"
+    },
+    "pg_default_services": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "array",
+      "default": [
+        {
+          "check": "/primary",
+          "dest": "default",
+          "name": "primary",
+          "port": 5433,
+          "selector": "[]"
+        },
+        {
+          "backup": "[? pg_role == `primary` || pg_role == `offline` ]",
+          "check": "/read-only",
+          "dest": "default",
+          "name": "replica",
+          "port": 5434,
+          "selector": "[]"
+        },
+        {
+          "check": "/primary",
+          "dest": "postgres",
+          "name": "default",
+          "port": 5436,
+          "selector": "[]"
+        },
+        {
+          "backup": "[? pg_role == `replica` \u0026\u0026 !pg_offline_query]",
+          "check": "/replica",
+          "dest": "postgres",
+          "name": "offline",
+          "port": 5438,
+          "selector": "[? pg_role == `offline` || pg_offline_query ]"
+        }
+      ],
+      "desc": "postgres default service definitions",
+      "doc": "https://pigsty.io/docs/pgsql/service",
+      "items": {
+        "$ref": "#/defs/pg_service"
+      }
+    },
+    "pg_delay": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "integer",
+      "default": 0,
+      "desc": "replication apply delay for standby cluster leader"
+    },
+    "pg_dns_suffix": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "pgsql dns suffix, '' by default"
+    },
+    "pg_dns_target": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "auto",
+      "enum": [
+        "auto",
+        "primary",
+        "vip",
+        "none"
+      ],
+      "desc": "auto, primary, vip, none, or ad hoc ip"
+    },
+    "pg_dummy_filesize": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "64MiB",
+      "desc": "size of `/pg/dummy`, hold 64MB disk space for emergency use"
+    },
+    "pg_encoding": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "UTF8",
+      "desc": "database cluster encoding, `UTF8` by default"
+    },
+    "pg_etcd_password": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "etcd password for this pg cluster, '' to use pg_cluster"
+    },
+    "pg_exporter_auto_discovery": {
+      "module": "PGSQL",
+      "section": "PG_EXPORTER",
+      "role": "pg_exporters",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable auto database discovery? enabled by default"
+    },
+    "pg_exporter_cache_ttls": {
+      "module": "PGSQL",
+      "section": "PG_EXPORTER",
+      "role": "pg_exporters",
+      "level": "",
+      "type": "string",
+      "default": "1,10,60,300",
+      "desc": "pg_exporter collector ttl stage in seconds, '1,10,60,300' by default"
+    },
+    "pg_exporter_config": {
+      "module": "PGSQL",
+      "section": "PG_EXPORTER",
+      "role": "pg_exporters",
+      "level": "",
+      "type": "string",
+      "default": "pg_exporter.yml",
+      "desc": "pg_exporter configuration file name"
+    },
+    "pg_exporter_connect_timeout": {
+      "module": "PGSQL",
+      "section": "PG_EXPORTER",
+      "role": "pg_exporters",
+      "level": "",
+      "type": "integer",
+      "default": 200,
+      "desc": "pg_exporter connect timeout in ms, 200 by default"
+    },
+    "pg_exporter_enabled": {
+      "module": "PGSQL",
+      "section": "PG_MONITOR",
+      "role": "pg_monitor",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable pg_exporter on pgsql hosts?"
+    },
+    "pg_exporter_exclude_database": {
+      "module": "PGSQL",
+      "section": "PG_EXPORTER",
+      "role": "pg_exporters",
+      "level": "",
+      "type": "string",
+      "default": "template0,template1,postgres",
+      "desc": "csv of database that WILL NOT be monitored during auto-discovery"
+    },
+    "pg_exporter_include_database": {
+      "module": "PGSQL",
+      "section": "PG_EXPORTER",
+      "role": "pg_exporters",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "csv of database that WILL BE monitored during auto-discovery"
+    },
+    "pg_exporter_options": {
+      "module": "PGSQL",
+      "section": "PG_EXPORTER",
+      "role": "pg_exporters",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "overwrite extra options for pg_exporter"
+    },
+    "pg_exporter_params": {
+      "module": "PGSQL",
+      "section": "PG_EXPORTER",
+      "role": "pg_exporters",
+      "level": "",
+      "type": "string",
+      "default": "sslmode=disable",
+      "desc": "extra url parameters for pg_exporter dsn"
+    },
+    "pg_exporter_port": {
+      "module": "PGSQL",
+      "section": "PG_EXPORTER",
+      "role": "pg_exporters",
+      "level": "",
+      "type": "integer",
+      "default": 9630,
+      "desc": "pg_exporter listen port, 9630 by default"
+    },
+    "pg_exporter_url": {
+      "module": "PGSQL",
+      "section": "PG_EXPORTER",
+      "role": "pg_exporters",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "overwrite auto-generate pg dsn if specified"
+    },
+    "pg_extensions": {
+      "module": "PGSQL",
+      "section": "PG_INSTALL",
+      "role": "pgsql",
+      "level": "",
+      "type": "array",
+      "default": [],
+      "desc": "pg extensions to be installed, alias can be used"
+    },
+    "pg_files": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "array",
+      "default": [],
+      "desc": "extra files to be copied to postgres data directory (e.g. license)"
+    },
+    "pg_fs_backup": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "/data/backups",
+      "desc": "postgres backup data directory, `/data/backups` by default"
+    },
+    "pg_fs_main": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "/data/postgres",
+      "desc": "postgres main data directory, `/data/postgres` by default"
+    },
+    "pg_group": {
+      "module": "PGSQL",
+      "section": "PG_IDENTITY",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "integer",
+      "impact": "init-only",
+      "desc": "pgsql shard index number, optional identity for sharding clusters"
+    },
+    "pg_hba_rules": {
+      "module": "PGSQL",
+      "section": "PG_BUSINESS",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "array",
+      "default": [],
+      "impact": "action:pgsql-hba",
+      "desc": "business hba rules for postgres",
+      "label": "HBA 规则",
+      "doc": "https://pigsty.io/docs/pgsql/config/hba",
+      "items": {
+        "$ref": "#/defs/hba_rule"
+      }
+    },
+    "pg_init": {
+      "module": "PGSQL",
+      "section": "PG_PROVISION",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "pg-init",
+      "desc": "provision init script for cluster template, `pg-init` by default"
+    },
+    "pg_instances": {
+      "module": "PGSQL",
+      "section": "PG_IDENTITY",
+      "role": "pgsql",
+      "level": "INSTANCE",
+      "type": "object",
+      "impact": "init-only",
+      "desc": "define multiple pg instances on node in `{port:ins_vars}` format"
+    },
+    "pg_io_method": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "GLOBAL",
+      "type": "string",
+      "default": "worker",
+      "enum": [
+        "auto",
+        "fsync",
+        "worker",
+        "io_uring"
+      ],
+      "desc": "io method for postgres, auto,fsync,worker,io_uring, worker by default"
+    },
+    "pg_lc_collate": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "C",
+      "desc": "database cluster collate, `C` by default"
+    },
+    "pg_lc_ctype": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "C",
+      "desc": "database character type, `C` by default"
+    },
+    "pg_libs": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "pg_stat_statements, auto_explain",
+      "desc": "preloaded libraries, `pg_stat_statements,auto_explain` by default"
+    },
+    "pg_listen": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "0.0.0.0",
+      "desc": "postgres/pgbouncer listen addresses, comma separated list"
+    },
+    "pg_locale": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "C",
+      "desc": "database cluster local, `C` by default"
+    },
+    "pg_localhost": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "/var/run/postgresql",
+      "desc": "postgres unix socket dir for localhost connection"
+    },
+    "pg_log_dir": {
+      "module": "PGSQL",
+      "section": "PG_INSTALL",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "/pg/log/postgres",
+      "desc": "postgres log dir, `/pg/log/postgres` by default"
+    },
+    "pg_max_conn": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "auto",
+      "desc": "postgres max connections, `auto` will use recommended value"
+    },
+    "pg_mode": {
+      "module": "PGSQL",
+      "section": "PG_IDENTITY",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "pgsql",
+      "enum": [
+        "pgsql",
+        "citus",
+        "mssql",
+        "mysql",
+        "ivory",
+        "pgtde",
+        "polar",
+        "gpsql",
+        "agens",
+        "oriole",
+        "pgedge"
+      ],
+      "identity": true,
+      "impact": "init-only",
+      "desc": "pgsql cluster mode: pgsql,citus,mssql,mysql,ivory,pgtde,polar,gpsql,agens,oriole,pgedge",
+      "label": "PG 集群模式",
+      "doc": "https://pigsty.io/docs/pgsql/param"
+    },
+    "pg_monitor_password": {
+      "module": "PGSQL",
+      "section": "PG_BUSINESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "DBUser.Monitor"
+    },
+    "pg_monitor_username": {
+      "module": "PGSQL",
+      "section": "PG_BUSINESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "dbuser_monitor"
+    },
+    "pg_namespace": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "/pg",
+      "desc": "top level key namespace in etcd, used by patroni \u0026 vip"
+    },
+    "pg_offline_query": {
+      "module": "PGSQL",
+      "section": "PG_IDENTITY",
+      "role": "pgsql",
+      "level": "INSTANCE",
+      "type": "boolean",
+      "default": false,
+      "desc": "set to true to enable offline queries on this instance"
+    },
+    "pg_packages": {
+      "module": "PGSQL",
+      "section": "PG_INSTALL",
+      "role": "pgsql",
+      "level": "",
+      "type": "array",
+      "default": [
+        "pgsql-main pgsql-common"
+      ],
+      "desc": "pg packages to be installed, alias can be used",
+      "items": {
+        "type": "string"
+      }
+    },
+    "pg_parameters": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "object",
+      "default": {},
+      "desc": "extra parameters in postgresql.auto.conf"
+    },
+    "pg_pitr": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "any",
+      "desc": "define a PITR task"
+    },
+    "pg_port": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "integer",
+      "default": 5432,
+      "desc": "postgres listen port, 5432 by default"
+    },
+    "pg_primary_db": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "postgres",
+      "desc": "primary database name, used by citus,etc... ,postgres by default"
+    },
+    "pg_provision": {
+      "module": "PGSQL",
+      "section": "PG_PROVISION",
+      "role": "pgsql",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "provision postgres cluster after bootstrap"
+    },
+    "pg_pwd_enc": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "scram-sha-256",
+      "desc": "passwords encryption algorithm: fixed to scram-sha-256"
+    },
+    "pg_reload": {
+      "module": "PGSQL",
+      "section": "PG_PROVISION",
+      "role": "pgsql",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "reload postgres/pgbouncer/vip after conf changes"
+    },
+    "pg_replication_password": {
+      "module": "PGSQL",
+      "section": "PG_BUSINESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "DBUser.Replicator"
+    },
+    "pg_replication_username": {
+      "module": "PGSQL",
+      "section": "PG_BUSINESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "replicator"
+    },
+    "pg_rm_backup": {
+      "module": "PGSQL",
+      "section": "PG_REMOVE",
+      "role": "pg_remove",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "remove pgbackrest backup during primary remove? true by default"
+    },
+    "pg_rm_data": {
+      "module": "PGSQL",
+      "section": "PG_REMOVE",
+      "role": "pg_remove",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "remove postgres data during remove? true by default"
+    },
+    "pg_rm_pkg": {
+      "module": "PGSQL",
+      "section": "PG_REMOVE",
+      "role": "pg_remove",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "uninstall postgres packages during remove? true by default"
+    },
+    "pg_role": {
+      "module": "PGSQL",
+      "section": "PG_IDENTITY",
+      "role": "pgsql",
+      "level": "INSTANCE",
+      "type": "string",
+      "enum": [
+        "primary",
+        "replica",
+        "standby",
+        "offline",
+        "delayed"
+      ],
+      "identity": true,
+      "impact": "init-only",
+      "desc": "pgsql role, required, could be primary,replica,offline",
+      "label": "实例角色"
+    },
+    "pg_rpo": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "integer",
+      "default": 1048576,
+      "desc": "recovery point objective in bytes, `1MiB` at most by default"
+    },
+    "pg_rto": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "norm",
+      "enum": [
+        "fast",
+        "norm",
+        "safe",
+        "wide"
+      ],
+      "desc": "shared rto mode for patroni \u0026 haproxy: fast,norm,safe,wide"
+    },
+    "pg_rto_plan": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "object",
+      "default": {
+        "fast": [
+          20,
+          5,
+          5,
+          15,
+          5,
+          "1s",
+          "0.5s",
+          "1s",
+          3,
+          3
+        ],
+        "norm": [
+          30,
+          5,
+          10,
+          25,
+          5,
+          "2s",
+          "1s",
+          "2s",
+          3,
+          3
+        ],
+        "safe": [
+          60,
+          10,
+          20,
+          45,
+          10,
+          "3s",
+          "1.5s",
+          "3s",
+          3,
+          3
+        ],
+        "wide": [
+          120,
+          20,
+          30,
+          95,
+          15,
+          "4s",
+          "2s",
+          "4s",
+          3,
+          3
+        ]
+      },
+      "desc": "[ttl, loop, retry, start, margin, inter, fastinter, downinter, rise, fall]"
+    },
+    "pg_safeguard": {
+      "module": "PGSQL",
+      "section": "PG_REMOVE",
+      "role": "pg_remove",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "stop pg_remove running if pg_safeguard is enabled, false by default"
+    },
+    "pg_seq": {
+      "module": "PGSQL",
+      "section": "PG_IDENTITY",
+      "role": "pgsql",
+      "level": "INSTANCE",
+      "type": "integer",
+      "identity": true,
+      "impact": "init-only",
+      "desc": "pgsql instance seq number, required identity parameter",
+      "label": "实例序号"
+    },
+    "pg_service_provider": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "dedicate haproxy node group name, or empty string for local nodes by default"
+    },
+    "pg_services": {
+      "module": "PGSQL",
+      "section": "PG_BUSINESS",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "array",
+      "default": [],
+      "impact": "action:pgsql-svc",
+      "desc": "postgres business services",
+      "label": "服务定义",
+      "doc": "https://pigsty.io/docs/pgsql/service",
+      "items": {
+        "$ref": "#/defs/pg_service"
+      }
+    },
+    "pg_shard": {
+      "module": "PGSQL",
+      "section": "PG_IDENTITY",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "string",
+      "identity": true,
+      "impact": "init-only",
+      "desc": "pgsql shard name, optional identity for sharding clusters"
+    },
+    "pg_shared_buffer_ratio": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "number",
+      "default": 0.25,
+      "desc": "postgres shared buffers ratio, 0.25 by default, 0.1~0.4"
+    },
+    "pg_storage_type": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "SSD",
+      "enum": [
+        "SSD",
+        "HDD"
+      ],
+      "desc": "storage type for pg main data, SSD,HDD, SSD by default"
+    },
+    "pg_upstream": {
+      "module": "PGSQL",
+      "section": "PG_IDENTITY",
+      "role": "pgsql",
+      "level": "INSTANCE",
+      "type": "string",
+      "impact": "init-only",
+      "desc": "repl upstream ip addr for standby cluster or cascade replica"
+    },
+    "pg_users": {
+      "module": "PGSQL",
+      "section": "PG_BUSINESS",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "array",
+      "default": [],
+      "impact": "action:pgsql-user",
+      "desc": "postgres business users",
+      "label": "业务用户",
+      "doc": "https://pigsty.io/docs/pgsql/config/user",
+      "items": {
+        "$ref": "#/defs/pg_user"
+      }
+    },
+    "pg_version": {
+      "module": "PGSQL",
+      "section": "PG_INSTALL",
+      "role": "pgsql",
+      "level": "",
+      "type": "integer",
+      "default": 18,
+      "desc": "postgres major version to be installed, 18 by default"
+    },
+    "pg_vip_address": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "127.0.0.1/24",
+      "desc": "vip address in `\u003cipv4\u003e/\u003cmask\u003e` format, require if vip is enabled"
+    },
+    "pg_vip_enabled": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "enable a l2 vip for pgsql primary? false by default"
+    },
+    "pg_vip_interface": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "auto",
+      "desc": "vip network interface to listen, auto by default"
+    },
+    "pg_weight": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "INSTANCE",
+      "type": "integer",
+      "default": 100,
+      "desc": "relative load balance weight in service, 100 by default, 0-255"
+    },
+    "pgb_default_hba_rules": {
+      "module": "PGSQL",
+      "section": "PG_PROVISION",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "array",
+      "default": [
+        {
+          "addr": "local",
+          "auth": "peer",
+          "db": "pgbouncer",
+          "order": 100,
+          "title": "dbsu local admin access with os ident",
+          "user": "${dbsu}"
+        },
+        {
+          "addr": "localhost",
+          "auth": "pwd",
+          "db": "all",
+          "order": 150,
+          "title": "allow all user local access with pwd",
+          "user": "all"
+        },
+        {
+          "addr": "intra",
+          "auth": "pwd",
+          "db": "pgbouncer",
+          "order": 200,
+          "title": "monitor access via intranet with pwd",
+          "user": "${monitor}"
+        },
+        {
+          "addr": "world",
+          "auth": "deny",
+          "db": "all",
+          "order": 250,
+          "title": "reject all other monitor access addr",
+          "user": "${monitor}"
+        },
+        {
+          "addr": "intra",
+          "auth": "pwd",
+          "db": "all",
+          "order": 300,
+          "title": "admin access via intranet with pwd",
+          "user": "${admin}"
+        },
+        {
+          "addr": "world",
+          "auth": "deny",
+          "db": "all",
+          "order": 350,
+          "title": "reject all other admin access addr",
+          "user": "${admin}"
+        },
+        {
+          "addr": "intra",
+          "auth": "pwd",
+          "db": "all",
+          "order": 400,
+          "title": "allow all user intra access with pwd",
+          "user": "all"
+        }
+      ],
+      "desc": "pgbouncer default host-based authentication rules, order by `order`",
+      "doc": "https://pigsty.io/docs/pgsql/config/hba",
+      "items": {
+        "$ref": "#/defs/hba_rule"
+      }
+    },
+    "pgb_hba_rules": {
+      "module": "PGSQL",
+      "section": "PG_BUSINESS",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "array",
+      "default": [],
+      "impact": "action:pgsql-hba",
+      "desc": "business hba rules for pgbouncer",
+      "label": "Pgbouncer HBA 规则",
+      "doc": "https://pigsty.io/docs/pgsql/config/hba",
+      "items": {
+        "$ref": "#/defs/hba_rule"
+      }
+    },
+    "pgbackrest_enabled": {
+      "module": "PGSQL",
+      "section": "PG_BACKUP",
+      "role": "pgsql",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable pgbackrest on pgsql host?"
+    },
+    "pgbackrest_exporter_enabled": {
+      "module": "PGSQL",
+      "section": "PG_MONITOR",
+      "role": "pg_monitor",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable pgbackrest_exporter on pgsql hosts?"
+    },
+    "pgbackrest_exporter_options": {
+      "module": "PGSQL",
+      "section": "PG_MONITOR",
+      "role": "pg_monitor",
+      "level": "",
+      "type": "string",
+      "default": ""
+    },
+    "pgbackrest_exporter_port": {
+      "module": "PGSQL",
+      "section": "PG_MONITOR",
+      "role": "pg_monitor",
+      "level": "",
+      "type": "integer",
+      "default": 9854,
+      "desc": "pgbackrest_exporter listen port, 9854 by default"
+    },
+    "pgbackrest_init_backup": {
+      "module": "PGSQL",
+      "section": "PG_BACKUP",
+      "role": "pgsql",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "take a full backup after pgbackrest is initialized?"
+    },
+    "pgbackrest_log_dir": {
+      "module": "PGSQL",
+      "section": "PG_BACKUP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "/pg/log/pgbackrest",
+      "desc": "pgbackrest log dir, `/pg/log/pgbackrest` by default"
+    },
+    "pgbackrest_method": {
+      "module": "PGSQL",
+      "section": "PG_BACKUP",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "local",
+      "enum": [
+        "local",
+        "minio"
+      ],
+      "impact": "playbook",
+      "desc": "pgbackrest repo method: local,minio,[user-defined...]",
+      "label": "备份仓库类型"
+    },
+    "pgbackrest_repo": {
+      "module": "PGSQL",
+      "section": "PG_BACKUP",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "object",
+      "default": {
+        "local": {
+          "path": "/pg/backup",
+          "retention_full": 2,
+          "retention_full_type": "count"
+        },
+        "minio": {
+          "block": "y",
+          "bundle": "y",
+          "bundle_limit": "20MiB",
+          "bundle_size": "128MiB",
+          "cipher_pass": "pgBackRest",
+          "cipher_type": "aes-256-cbc",
+          "path": "/pgbackrest",
+          "retention_full": 14,
+          "retention_full_type": "time",
+          "s3_bucket": "pgsql",
+          "s3_endpoint": "sss.pigsty",
+          "s3_key": "pgbackrest",
+          "s3_key_secret": "S3User.Backup",
+          "s3_region": "us-east-1",
+          "s3_uri_style": "path",
+          "storage_ca_file": "/etc/pki/ca.crt",
+          "storage_port": 9000,
+          "type": "s3"
+        }
+      },
+      "impact": "playbook",
+      "desc": "pgbackrest repo: https://pgbackrest.org/configuration.html # section-repository",
+      "label": "备份仓库",
+      "doc": "https://pigsty.io/docs/pgsql/backup",
+      "items": {
+        "$ref": "#/defs/pgbackrest_repo"
+      }
+    },
+    "pgbouncer_auth_query": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "query postgres to retrieve unlisted business users?"
+    },
+    "pgbouncer_enabled": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "if disabled, pgbouncer will not be launched on pgsql host"
+    },
+    "pgbouncer_exporter_enabled": {
+      "module": "PGSQL",
+      "section": "PG_MONITOR",
+      "role": "pg_monitor",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable pgbouncer_exporter on pgsql hosts?"
+    },
+    "pgbouncer_exporter_options": {
+      "module": "PGSQL",
+      "section": "PG_MONITOR",
+      "role": "pg_monitor",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "overwrite extra options for pgbouncer_exporter"
+    },
+    "pgbouncer_exporter_port": {
+      "module": "PGSQL",
+      "section": "PG_MONITOR",
+      "role": "pg_monitor",
+      "level": "",
+      "type": "integer",
+      "default": 9631,
+      "desc": "pgbouncer_exporter listen port, 9631 by default"
+    },
+    "pgbouncer_exporter_url": {
+      "module": "PGSQL",
+      "section": "PG_MONITOR",
+      "role": "pg_monitor",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "overwrite auto-generate pgbouncer dsn if specified"
+    },
+    "pgbouncer_ignore_param": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "array",
+      "default": [
+        "extra_float_digits",
+        "application_name",
+        "TimeZone",
+        "DateStyle",
+        "IntervalStyle",
+        "search_path"
+      ]
+    },
+    "pgbouncer_log_dir": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "/pg/log/pgbouncer",
+      "desc": "pgbouncer log dir, `/pg/log/pgbouncer` by default"
+    },
+    "pgbouncer_poolmode": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "CLUSTER",
+      "type": "string",
+      "default": "transaction",
+      "enum": [
+        "transaction",
+        "session",
+        "statement"
+      ],
+      "impact": "restart",
+      "desc": "pooling mode: transaction,session,statement, transaction by default"
+    },
+    "pgbouncer_port": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "integer",
+      "default": 6432,
+      "desc": "pgbouncer listen port, 6432 by default"
+    },
+    "pgbouncer_sslmode": {
+      "module": "PGSQL",
+      "section": "PG_ACCESS",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "default": "disable",
+      "desc": "pgbouncer client ssl mode, disable by default"
+    },
+    "pgsodium_getkey_script": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "desc": "pgsodium getkey script path, pgsodium_getkey by default"
+    },
+    "pgsodium_key": {
+      "module": "PGSQL",
+      "section": "PG_BOOTSTRAP",
+      "role": "pgsql",
+      "level": "",
+      "type": "string",
+      "desc": "pgsodium key, 64 hex digit, default to sha256(pg_cluster)"
+    },
+    "port": {
+      "module": "OTHER",
+      "role": "juice",
+      "level": "",
+      "type": "integer",
+      "desc": "metrics port, default: 9567"
+    },
+    "postgres": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string"
+    },
+    "process": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "integer",
+      "desc": "Parallel restore processes (defaults to node_cpu)"
+    },
+    "proxy_env": {
+      "module": "INFRA",
+      "section": "INFRA_META",
+      "role": "infra",
+      "level": "",
+      "type": "object",
+      "default": {
+        "no_proxy": "localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16,*.pigsty,*.aliyun.com,mirrors.*,*.myqcloud.com,*.tsinghua.edu.cn"
+      }
+    },
+    "redis_aof_enabled": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "redis aof enabled"
+    },
+    "redis_bind_address": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "string",
+      "default": "0.0.0.0",
+      "desc": "bind address, empty string turns to inventory_hostname"
+    },
+    "redis_cluster": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "CLUSTER",
+      "type": "string",
+      "identity": true,
+      "impact": "init-only",
+      "desc": "name of this redis cluster @ cluster level"
+    },
+    "redis_cluster_replicas": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "integer",
+      "default": 1,
+      "desc": "how many replicas for a master in redis cluster ?"
+    },
+    "redis_conf": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "string",
+      "default": "redis.conf",
+      "desc": "config template path (except sentinel)"
+    },
+    "redis_exporter_enabled": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "install redis exporter on redis nodes?"
+    },
+    "redis_exporter_options": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "default cli args for redis exporter"
+    },
+    "redis_exporter_port": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "integer",
+      "default": 9121,
+      "desc": "default port for redis exporter"
+    },
+    "redis_fs_main": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "string",
+      "default": "/data/redis",
+      "desc": "main data directory for redis"
+    },
+    "redis_instances": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "object",
+      "desc": "redis instances definition of this redis node @ node level"
+    },
+    "redis_max_memory": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "string",
+      "default": "1GB",
+      "desc": "max memory used by each redis instance"
+    },
+    "redis_mem_policy": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "string",
+      "default": "allkeys-lru",
+      "desc": "memory eviction policy"
+    },
+    "redis_mode": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "string",
+      "default": "standalone",
+      "desc": "standalone,cluster,sentinel"
+    },
+    "redis_node": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "integer",
+      "desc": "redis node identifier, integer sequence @ node level"
+    },
+    "redis_password": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "masterauth \u0026 requirepass password, disable by empty string"
+    },
+    "redis_rdb_save": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "array",
+      "default": [
+        "1200 1"
+      ],
+      "desc": "redis rdb save directives, disable with empty list"
+    },
+    "redis_rename_commands": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "object",
+      "default": {},
+      "desc": "rename dangerous commands"
+    },
+    "redis_rm_data": {
+      "module": "REDIS",
+      "section": "REDIS_REMOVE",
+      "role": "redis_remove",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "remove redis data dir? (/data/redis/...)"
+    },
+    "redis_rm_pkg": {
+      "module": "REDIS",
+      "section": "REDIS_REMOVE",
+      "role": "redis_remove",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "uninstall selected engine \u0026 redis-exporter packages?"
+    },
+    "redis_safeguard": {
+      "module": "REDIS",
+      "section": "REDIS_REMOVE",
+      "role": "redis_remove",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "prevent purging running redis instance?"
+    },
+    "redis_sentinel_monitor": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "array",
+      "default": [],
+      "desc": "sentinel master list, works on sentinel cluster only"
+    },
+    "redis_seq": {
+      "module": "REDIS",
+      "level": "INSTANCE",
+      "type": "integer",
+      "identity": true,
+      "impact": "init-only"
+    },
+    "redis_type": {
+      "module": "REDIS",
+      "section": "REDIS",
+      "role": "redis",
+      "level": "",
+      "type": "string",
+      "default": "redis",
+      "desc": "redis implementation: redis or valkey"
+    },
+    "region": {
+      "module": "INFRA",
+      "section": "INFRA_META",
+      "role": "infra",
+      "level": "GLOBAL",
+      "type": "string",
+      "default": "default",
+      "enum": [
+        "default",
+        "china",
+        "europe"
+      ],
+      "desc": "upstream mirror region: default,china,europe"
+    },
+    "repo": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "object",
+      "desc": "Repository to restore from (defaults to pgbackrest_repo[pgbackrest_method])"
+    },
+    "repo_enabled": {
+      "module": "INFRA",
+      "section": "REPO",
+      "role": "repo",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "create local yum repo on this infra node?"
+    },
+    "repo_endpoint": {
+      "module": "INFRA",
+      "section": "REPO",
+      "role": "repo",
+      "level": "",
+      "type": "string",
+      "default": "http://${admin_ip}:80",
+      "desc": "access point to this repo by domain or ip:port"
+    },
+    "repo_exists": {
+      "module": "INFRA",
+      "section": "INTERNAL",
+      "role": "repo",
+      "level": "",
+      "type": "boolean",
+      "default": false
+    },
+    "repo_extra_packages": {
+      "module": "INFRA",
+      "section": "REPO",
+      "role": "repo",
+      "level": "",
+      "type": "array",
+      "desc": "extra packages to be downloaded to local repo"
+    },
+    "repo_home": {
+      "module": "INFRA",
+      "section": "REPO",
+      "role": "repo",
+      "level": "",
+      "type": "string",
+      "default": "/www",
+      "desc": "repo home dir, /www by default (soft link to nginx_data)"
+    },
+    "repo_modules": {
+      "module": "INFRA",
+      "section": "REPO",
+      "role": "repo",
+      "level": "",
+      "type": "string",
+      "default": "infra,node,pgsql",
+      "desc": "which repo modules are installed in repo_upstream"
+    },
+    "repo_name": {
+      "module": "INFRA",
+      "section": "REPO",
+      "role": "repo",
+      "level": "",
+      "type": "string",
+      "default": "pigsty",
+      "desc": "repo name, pigsty by default"
+    },
+    "repo_packages": {
+      "module": "INFRA",
+      "section": "REPO",
+      "role": "repo",
+      "level": "",
+      "type": "array",
+      "desc": "default packages to be downloaded to local repo, use repo_upstream_default if not explicitly defined"
+    },
+    "repo_remove": {
+      "module": "INFRA",
+      "section": "REPO",
+      "role": "repo",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "remove existing upstream repo"
+    },
+    "repo_upstream": {
+      "module": "INFRA",
+      "section": "REPO",
+      "role": "repo",
+      "level": "",
+      "type": "array",
+      "desc": "this default vault is pick from repo_upstream_default according to `os_package` if not explicitly defined"
+    },
+    "repo_url_packages": {
+      "module": "INFRA",
+      "section": "REPO",
+      "role": "repo",
+      "level": "",
+      "type": "array",
+      "default": [],
+      "desc": "extra packages from url"
+    },
+    "set": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "string",
+      "desc": "Backup set to restore from, 'latest' by default"
+    },
+    "src_cls": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "desc": "src cluster name         \u003cREQUIRED\u003e"
+    },
+    "src_db": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "desc": "src database name        \u003cREQUIRED\u003e"
+    },
+    "src_dns": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "desc": "src cluster dns name     [OPTIONAL]"
+    },
+    "src_ip": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "desc": "src cluster primary ip   \u003cREQUIRED\u003e"
+    },
+    "src_list": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "array",
+      "desc": "src cluster replicas ip  [OPTIONAL]"
+    },
+    "src_pg": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "desc": "if defined, use this as src dbsu pgurl instead of:"
+    },
+    "src_vip": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "desc": "src cluster vip address  [OPTIONAL]"
+    },
+    "state": {
+      "module": "OTHER",
+      "role": "juice",
+      "level": "",
+      "type": "string",
+      "desc": "create | absent, default: create"
+    },
+    "sub_conn": {
+      "module": "PGSQL",
+      "role": "pg_migration",
+      "level": "",
+      "type": "string",
+      "desc": "if defined, use this as subscription connstr instead of:"
+    },
+    "time": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "string",
+      "desc": "Recovery target time in UTC format (YYYY-MM-DD HH:MM:SS+00)"
+    },
+    "timeline": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "string",
+      "desc": "Target timeline, can be an integer, 'latest' by default"
+    },
+    "type": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "string",
+      "desc": "Recovery target type: default, time, xid, name, lsn, immediate"
+    },
+    "unit": {
+      "module": "OTHER",
+      "role": "juice",
+      "level": "",
+      "type": "string",
+      "desc": "systemd service name, default: juicefs-\u003cname\u003e"
+    },
+    "vector_clean": {
+      "module": "NODE",
+      "role": "node_monitor",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "purge vector data dir during init?"
+    },
+    "vector_data": {
+      "module": "NODE",
+      "role": "node_monitor",
+      "level": "",
+      "type": "string",
+      "default": "/data/vector",
+      "desc": "vector data dir, /data/vector by default"
+    },
+    "vector_enabled": {
+      "module": "NODE",
+      "role": "node_monitor",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable vector log collector?"
+    },
+    "vector_log_endpoint": {
+      "module": "NODE",
+      "role": "node_monitor",
+      "level": "",
+      "type": "array",
+      "default": [
+        "infra"
+      ],
+      "desc": "if defined, sending vector log to this endpoint."
+    },
+    "vector_port": {
+      "module": "NODE",
+      "role": "node_monitor",
+      "level": "",
+      "type": "integer",
+      "default": 9598,
+      "desc": "vector metrics port, 9598 by default"
+    },
+    "vector_read_from": {
+      "module": "NODE",
+      "role": "node_monitor",
+      "level": "",
+      "type": "string",
+      "default": "beginning",
+      "desc": "vector read from beginning or end"
+    },
+    "version": {
+      "module": "INFRA",
+      "section": "INFRA_META",
+      "role": "infra",
+      "level": "GLOBAL",
+      "type": "string",
+      "default": "v4.5.0",
+      "desc": "pigsty version string",
+      "label": "Pigsty 版本"
+    },
+    "vibe_data": {
+      "module": "OTHER",
+      "role": "vibe",
+      "level": "",
+      "type": "string",
+      "default": "/fs",
+      "desc": "vibe workspace directory"
+    },
+    "vip_address": {
+      "module": "NODE",
+      "section": "NODE_VIP",
+      "role": "node",
+      "level": "",
+      "type": "array",
+      "desc": "node vip address in ipv4 format, required if vip is enabled"
+    },
+    "vip_auth_pass": {
+      "module": "NODE",
+      "section": "NODE_VIP",
+      "role": "node",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "vrrp auth password, empty to use '\u003ccls\u003e-\u003cvrid\u003e' as default"
+    },
+    "vip_dns_suffix": {
+      "module": "NODE",
+      "section": "NODE_VIP",
+      "role": "node",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "node vip dns name suffix, empty string by default"
+    },
+    "vip_enabled": {
+      "module": "NODE",
+      "section": "NODE_VIP",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "enable vip on this node cluster?"
+    },
+    "vip_exporter_port": {
+      "module": "NODE",
+      "section": "NODE_VIP",
+      "role": "node",
+      "level": "",
+      "type": "integer",
+      "desc": "keepalived exporter listen port, 9650 by default"
+    },
+    "vip_interface": {
+      "module": "NODE",
+      "section": "NODE_VIP",
+      "role": "node",
+      "level": "",
+      "type": "string",
+      "default": "auto",
+      "desc": "node vip network interface to listen, `auto` by default"
+    },
+    "vip_preempt": {
+      "module": "NODE",
+      "section": "NODE_VIP",
+      "role": "node",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "optional, `true/false`, false by default, enable vip preemption"
+    },
+    "vip_role": {
+      "module": "NODE",
+      "section": "NODE_VIP",
+      "role": "node",
+      "level": "",
+      "type": "string",
+      "default": "backup",
+      "desc": "optional, `master|backup`, backup by default, use as init role"
+    },
+    "vip_vrid": {
+      "module": "NODE",
+      "section": "NODE_VIP",
+      "role": "node",
+      "level": "",
+      "type": "array",
+      "desc": "required, integer, 1-254, should be unique among same VLAN"
+    },
+    "vlogs_clean": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "clean victoria-logs data during init?"
+    },
+    "vlogs_enabled": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable victoria-logs on this infra node?"
+    },
+    "vlogs_options": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": ""
+    },
+    "vlogs_port": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "integer",
+      "default": 9428,
+      "desc": "victoria-logs listen port, 9428 by default"
+    },
+    "vmalert_enabled": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable vmalert on this infra node?"
+    },
+    "vmalert_options": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "",
+      "desc": "vmalert extra server options"
+    },
+    "vmalert_port": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "integer",
+      "default": 8880,
+      "desc": "vmalert listen port, 8880 by default"
+    },
+    "vmetrics_clean": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "whether clean existing victoria metrics data during init?"
+    },
+    "vmetrics_enabled": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable victoria-metrics on this infra node?"
+    },
+    "vmetrics_options": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": ""
+    },
+    "vmetrics_port": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "integer",
+      "default": 8428,
+      "desc": "victoria-metrics listen port, 8428 by default"
+    },
+    "vmetrics_scrape_interval": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "10s",
+      "desc": "victoria global scrape interval, 10s by default"
+    },
+    "vmetrics_scrape_timeout": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": "8s",
+      "desc": "victoria global scrape timeout, 8s by default"
+    },
+    "vtraces_clean": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": false,
+      "desc": "clean victoria-traces data during init?"
+    },
+    "vtraces_enabled": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "boolean",
+      "default": true,
+      "desc": "enable victoria-traces on this infra node?"
+    },
+    "vtraces_options": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "string",
+      "default": ""
+    },
+    "vtraces_port": {
+      "module": "INFRA",
+      "section": "VICTORIA",
+      "role": "infra",
+      "level": "",
+      "type": "integer",
+      "default": 10428,
+      "desc": "victoria-traces listen port, 10428 by default"
+    },
+    "xid": {
+      "module": "PGSQL",
+      "section": "PG_PITR: Point-In-Time Recovery Configuration",
+      "role": "pg_pitr",
+      "level": "",
+      "type": "string",
+      "desc": "Recovery target: transaction ID, exclusive with time, name, lsn"
+    }
+  },
+  "defs": {
+    "app": {
+      "properties": {
+        "conf": {
+          "type": "object"
+        },
+        "image": {
+          "type": "string"
+        },
+        "ports": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "hba_rule": {
+      "properties": {
+        "addr": {
+          "enum": [
+            "world",
+            "intra",
+            "infra",
+            "admin",
+            "local",
+            "localhost",
+            "cluster"
+          ]
+        },
+        "auth": {
+          "enum": [
+            "deny",
+            "trust",
+            "pwd",
+            "sha",
+            "scram-sha-256",
+            "md5",
+            "ssl",
+            "ssl-md5",
+            "ssl-sha",
+            "os",
+            "ident",
+            "peer",
+            "cert"
+          ]
+        },
+        "db": {
+          "type": "string"
+        },
+        "order": {
+          "type": "integer"
+        },
+        "rules": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "title": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "infra_portal_entry": {
+      "properties": {
+        "auth": {
+          "type": "boolean"
+        },
+        "cert": {
+          "type": "string"
+        },
+        "certbot": {
+          "type": "string"
+        },
+        "conf": {
+          "type": "string"
+        },
+        "config": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "domains": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "enforce_https": {
+          "type": "boolean"
+        },
+        "index": {
+          "type": "boolean"
+        },
+        "key": {
+          "type": "string"
+        },
+        "log": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "realm": {
+          "type": "string"
+        },
+        "scheme": {
+          "enum": [
+            "http",
+            "https"
+          ]
+        },
+        "websocket": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "domain"
+      ],
+      "type": "object"
+    },
+    "infra_service_entry": {
+      "properties": {
+        "desc": {
+          "type": "string"
+        },
+        "desc_cn": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "name_cn": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "url"
+      ],
+      "type": "object"
+    },
+    "pg_database": {
+      "properties": {
+        "allowconn": {
+          "type": "boolean"
+        },
+        "baseline": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "connlimit": {
+          "type": "integer"
+        },
+        "encoding": {
+          "type": "string"
+        },
+        "extensions": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "lc_collate": {
+          "type": "string"
+        },
+        "lc_ctype": {
+          "type": "string"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "pgbouncer": {
+          "type": "boolean"
+        },
+        "pool_auth_user": {
+          "type": "string"
+        },
+        "pool_connlimit": {
+          "type": "integer"
+        },
+        "pool_mode": {
+          "enum": [
+            "transaction",
+            "session",
+            "statement"
+          ]
+        },
+        "pool_reserve": {
+          "type": "integer"
+        },
+        "pool_size": {
+          "type": "integer"
+        },
+        "pool_size_min": {
+          "type": "integer"
+        },
+        "register_datasource": {
+          "type": "boolean"
+        },
+        "revokeconn": {
+          "type": "boolean"
+        },
+        "schemas": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "state": {
+          "enum": [
+            "create",
+            "absent"
+          ]
+        },
+        "tablespace": {
+          "type": "string"
+        },
+        "template": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "pg_service": {
+      "properties": {
+        "backup": {
+          "type": "string"
+        },
+        "balance": {
+          "enum": [
+            "roundrobin",
+            "leastconn"
+          ]
+        },
+        "check": {
+          "type": "string"
+        },
+        "dest": {
+          "enum": [
+            "default",
+            "postgres",
+            "pgbouncer"
+          ]
+        },
+        "ip": {
+          "type": "string"
+        },
+        "maxconn": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "options": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer"
+        },
+        "selector": {
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "create",
+            "absent"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "port"
+      ],
+      "type": "object"
+    },
+    "pg_user": {
+      "properties": {
+        "bypassrls": {
+          "type": "boolean"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "connlimit": {
+          "type": "integer"
+        },
+        "createdb": {
+          "type": "boolean"
+        },
+        "createrole": {
+          "type": "boolean"
+        },
+        "expire_at": {
+          "type": "string"
+        },
+        "expire_in": {
+          "type": "integer"
+        },
+        "inherit": {
+          "type": "boolean"
+        },
+        "login": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "password": {
+          "sensitive": true,
+          "type": "string"
+        },
+        "pgbouncer": {
+          "type": "boolean"
+        },
+        "pool_connlimit": {
+          "type": "integer"
+        },
+        "pool_mode": {
+          "enum": [
+            "transaction",
+            "session",
+            "statement"
+          ]
+        },
+        "replication": {
+          "type": "boolean"
+        },
+        "roles": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "state": {
+          "enum": [
+            "create",
+            "absent"
+          ]
+        },
+        "superuser": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "pgbackrest_repo": {
+      "properties": {
+        "block": {
+          "type": "string"
+        },
+        "bundle": {
+          "type": "string"
+        },
+        "bundle_limit": {
+          "type": "string"
+        },
+        "bundle_size": {
+          "type": "string"
+        },
+        "cipher_pass": {
+          "sensitive": true,
+          "type": "string"
+        },
+        "cipher_type": {
+          "enum": [
+            "none",
+            "aes-256-cbc"
+          ]
+        },
+        "path": {
+          "type": "string"
+        },
+        "retention_archive": {
+          "type": "integer"
+        },
+        "retention_archive_type": {
+          "enum": [
+            "count",
+            "time"
+          ]
+        },
+        "retention_diff": {
+          "type": "integer"
+        },
+        "retention_diff_type": {
+          "enum": [
+            "count",
+            "time",
+            "version"
+          ]
+        },
+        "retention_full": {
+          "type": "integer"
+        },
+        "retention_full_type": {
+          "enum": [
+            "count",
+            "time",
+            "version"
+          ]
+        },
+        "s3_bucket": {
+          "type": "string"
+        },
+        "s3_endpoint": {
+          "type": "string"
+        },
+        "s3_key": {
+          "type": "string"
+        },
+        "s3_key_secret": {
+          "sensitive": true,
+          "type": "string"
+        },
+        "s3_region": {
+          "type": "string"
+        },
+        "s3_uri_style": {
+          "enum": [
+            "path",
+            "host"
+          ]
+        },
+        "storage_ca_file": {
+          "type": "string"
+        },
+        "storage_port": {
+          "type": "integer"
+        },
+        "type": {
+          "enum": [
+            "posix",
+            "s3",
+            "gcs",
+            "azure",
+            "sftp"
+          ]
+        }
+      },
+      "type": "object"
+    }
+  }
+}

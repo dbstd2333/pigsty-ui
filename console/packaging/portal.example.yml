@@ -1,0 +1,11 @@
+# Pigsty Console 的门户入口示例（infra_portal 片段）
+#
+# 1) 把下面的 console 条目合并进 pigsty.yml 的 all.vars.infra_portal
+# 2) 执行 ./infra.yml -t nginx 重新渲染 nginx 配置
+# 3) console 默认只监听 127.0.0.1:8860，必须经 Nginx 以 HTTPS 访问
+# 4) 域名 c.pigsty 需要能解析到管理节点（node_etc_hosts 或 dnsmasq）
+infra_portal:
+  console:
+    domain: c.pigsty          # 访问域名：https://c.pigsty
+    endpoint: 127.0.0.1:8860  # 后端监听地址，只允许本机
+    websocket: true           # 预置 HTTP/1.1 长连接，供作业日志 SSE 使用

@@ -1,0 +1,326 @@
+# Pigsty Console 动作白名单（MVP）
+# 前端只能提交 {action, params, check, confirm}，命令完全由本目录渲染。
+# 步骤类型：
+#   playbook  ANSIBLE playbook：./<playbook> -l <limit> [-t tags] [-e k=v]
+#   adhoc     ansible ad-hoc：ansible <host> -i pigsty.yml -b --become-user=<dbsu> -m shell -a '<command>'
+#   pitr      PITR：./pgsql-pitr.yml -l <cluster> -e '{"pg_pitr": {...}}'
+- id: pgsql-create
+  title: 初始化 PG 集群
+  description: 对尚未初始化的集群执行完整的 pgsql.yml，创建实例、复制、监控与备份配置。
+  category: pgsql
+  risk: medium
+  check: false
+  preconditions: [cluster_absent]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+  steps:
+    - cmd: playbook
+      playbook: pgsql.yml
+      limit: "{{ cluster }}"
+
+- id: pgsql-user
+  title: 创建/更新业务用户
+  description: 按 inventory 中的 pg_users 定义，在目标集群主库上创建或更新用户，并刷新 pgbouncer。
+  category: pgsql
+  risk: low
+  check: true
+  preconditions: [cluster_exists]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+    - { name: user, label: 用户, type: pg_user, of: cluster, required: true }
+  steps:
+    - cmd: playbook
+      playbook: pgsql-user.yml
+      limit: "{{ cluster }}"
+      vars: { username: "{{ user }}" }
+
+- id: pgsql-db
+  title: 创建/更新业务数据库
+  description: 按 inventory 中的 pg_databases 定义，在目标集群主库上创建或更新数据库。
+  category: pgsql
+  risk: low
+  check: true
+  preconditions: [cluster_exists]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+    - { name: db, label: 数据库, type: pg_db, of: cluster, required: true }
+  steps:
+    - cmd: playbook
+      playbook: pgsql-db.yml
+      limit: "{{ cluster }}"
+      vars: { dbname: "{{ db }}" }
+
+- id: pgsql-hba
+  title: 刷新 HBA 规则
+  description: 重新渲染 pg_hba.conf 与 pgbouncer HBA 并重载服务，不改动数据。
+  category: pgsql
+  risk: low
+  check: true
+  preconditions: [cluster_exists]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+  steps:
+    - cmd: playbook
+      playbook: pgsql.yml
+      limit: "{{ cluster }}"
+      tags: [pg_hba, pg_reload, pgbouncer_hba, pgbouncer_reload]
+
+- id: pgsql-svc
+  title: 刷新 PG 服务
+  description: 重新生成 haproxy/vip 服务定义与监控目标，用于集群成员或服务变更后。
+  category: pgsql
+  risk: low
+  check: true
+  preconditions: [cluster_exists]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+  steps:
+    - cmd: playbook
+      playbook: pgsql.yml
+      limit: "{{ cluster }}"
+      tags: [pg_service]
+
+- id: pgsql-ext
+  title: 安装 PG 扩展软件包
+  description: 安装 pg_extensions 中声明的软件包；库内 CREATE EXTENSION 请使用 pgsql-db 动作。
+  category: pgsql
+  risk: low
+  check: false
+  preconditions: [cluster_exists]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+  steps:
+    - cmd: playbook
+      playbook: pgsql.yml
+      limit: "{{ cluster }}"
+      tags: [pg_ext]
+
+- id: pgsql-crontab
+  title: 刷新定时任务
+  description: 重新生成 pg_crontab 中的定时任务（备份、清理等）。
+  category: pgsql
+  risk: low
+  check: true
+  preconditions: [cluster_exists]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+  steps:
+    - cmd: playbook
+      playbook: pgsql.yml
+      limit: "{{ cluster }}"
+      tags: [pg_crontab]
+
+- id: pgsql-add-replica
+  title: 添加副本实例
+  description: 对新加入 inventory 的节点执行 pgsql.yml 完成初始化与克隆，再刷新集群服务。
+  category: pgsql
+  risk: medium
+  check: false
+  preconditions: [cluster_exists, ips_in_cluster]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+    - { name: ips, label: 节点, type: ip_list, of: cluster, required: true, help: 必须是该集群 inventory 中的主机 }
+  steps:
+    - cmd: playbook
+      playbook: pgsql.yml
+      limit: "{{ ips }}"
+    - cmd: playbook
+      playbook: pgsql.yml
+      limit: "{{ cluster }}"
+      tags: [pg_service]
+
+- id: pgsql-rm-replica
+  title: 移除副本实例
+  description: 从集群中下线指定副本实例并刷新服务；主库会被拒绝。
+  category: pgsql
+  risk: high
+  gate: true
+  check: false
+  preconditions: [cluster_exists, ips_in_cluster, not_primary]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+    - { name: ips, label: 节点, type: ip_list, of: cluster, required: true }
+  steps:
+    - cmd: playbook
+      playbook: pgsql-rm.yml
+      limit: "{{ ips }}"
+    - cmd: playbook
+      playbook: pgsql.yml
+      limit: "{{ cluster }}"
+      tags: [pg_service]
+
+- id: patroni-param
+  title: 修改集群参数
+  description: 在主库上以 dbsu 执行 patronictl edit-config，把参数写入 DCS 并生效；需重启的参数由 UI 提示。
+  category: patroni
+  risk: medium
+  check: false
+  preconditions: [cluster_exists]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+    - { name: settings, label: 参数, type: object, required: true, help: "形如 {max_connections: 200} 的键值对" }
+  steps:
+    - cmd: adhoc
+      host: primary
+      become_user: dbsu
+      command: "patronictl -c /pg/bin/patroni.yml edit-config {{ cluster }} {{ settings_args }} --force"
+
+- id: pg-restart
+  title: 重启实例
+  description: 以 patronictl 重启指定实例；主库重启期间业务短暂不可写。
+  category: patroni
+  risk: high
+  gate: true
+  check: false
+  preconditions: [cluster_exists, member_exists]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+    - { name: member, label: 实例, type: pg_member, of: cluster, required: true }
+  steps:
+    - cmd: adhoc
+      host: primary
+      become_user: dbsu
+      command: "patronictl -c /pg/bin/patroni.yml restart {{ cluster }} {{ member_name }} --force"
+
+- id: pg-switchover
+  title: 主从切换
+  description: 以 patronictl 把 leader 切换到指定实例；成功后需要回写 inventory 中的 pg_role。
+  category: patroni
+  risk: high
+  gate: true
+  check: false
+  preconditions: [cluster_exists, member_exists]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+    - { name: leader, label: 当前主库, type: pg_member, of: cluster, required: true }
+    - { name: candidate, label: 目标主库, type: pg_member, of: cluster, required: true }
+  steps:
+    - cmd: adhoc
+      host: primary
+      become_user: dbsu
+      command: "patronictl -c /pg/bin/patroni.yml switchover {{ cluster }} --leader {{ leader_name }} --candidate {{ candidate_name }} --force"
+
+- id: node-add
+  title: 纳管节点
+  description: 对新节点执行 node.yml：安装软件源、node_exporter、vector、haproxy 等基础组件。
+  category: node
+  risk: medium
+  check: false
+  preconditions: [host_in_inventory]
+  params:
+    - { name: ips, label: 节点, type: ip_list, required: true }
+  steps:
+    - cmd: playbook
+      playbook: node.yml
+      limit: "{{ ips }}"
+
+- id: redis-create
+  title: 初始化 Redis 集群
+  description: 按 inventory 中的 redis_cluster 定义创建 Redis 集群/实例。
+  category: redis
+  risk: medium
+  check: false
+  preconditions: [nodes_managed]
+  params:
+    - { name: cluster, label: 集群, type: redis_cluster, required: true }
+  steps:
+    - cmd: playbook
+      playbook: redis.yml
+      limit: "{{ cluster }}"
+
+- id: backup-run
+  title: 执行备份
+  description: 在主库以 dbsu 执行 /pg/bin/pg-backup，创建 full/diff/incr 物理备份。
+  category: backup
+  risk: low
+  check: false
+  preconditions: [cluster_exists, backup_repo]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+    - { name: mode, label: 备份类型, type: enum, required: true, enum: [full, diff, incr], default: incr }
+  steps:
+    - cmd: adhoc
+      host: primary
+      become_user: dbsu
+      command: "/pg/bin/pg-backup {{ mode }}"
+
+- id: backup-check
+  title: 检查备份仓库
+  description: 在主库以 dbsu 执行 pgbackrest check，校验归档与仓库连通性。
+  category: backup
+  risk: readonly
+  check: false
+  preconditions: [cluster_exists, backup_repo]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+  steps:
+    - cmd: adhoc
+      host: primary
+      become_user: dbsu
+      command: "pgbackrest --stanza={{ cluster }} check"
+
+- id: restore-point
+  title: 创建恢复点
+  description: 在主库创建命名恢复点，作为 PITR 的精确目标。
+  category: backup
+  risk: low
+  check: false
+  preconditions: [cluster_exists]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+    - { name: name, label: 恢复点名称, type: string, required: true, pattern: "^[a-zA-Z0-9_.-]+$", default: console_point }
+  steps:
+    - cmd: adhoc
+      host: primary
+      become_user: dbsu
+      command: "psql -c \"SELECT pg_create_restore_point('{{ name }}')\""
+
+- id: pitr-clone
+  title: 克隆恢复到新集群
+  description: 用 pgsql-pitr.yml 把源集群的备份恢复到新集群，不影响源集群。
+  category: backup
+  risk: medium
+  check: false
+  preconditions: [cluster_exists, source_exists, pitr_window]
+  params:
+    - { name: cluster, label: 目标集群, type: pg_cluster, required: true, help: 接收恢复数据的新集群 }
+    - { name: source, label: 源集群, type: pg_cluster, required: true }
+    - { name: target, label: 恢复目标, type: object, required: true }
+    - { name: action, label: 恢复后动作, type: enum, required: true, enum: [pause, promote, shutdown], default: pause }
+  steps:
+    - cmd: pitr
+      cluster: "{{ cluster }}"
+      source: "{{ source }}"
+
+- id: pitr-inplace
+  title: 原地 PITR 恢复
+  description: 对目标集群原地恢复到指定时间点，覆盖当前数据目录，风险最高。
+  category: backup
+  risk: critical
+  check: false
+  gate: true
+  preconditions: [cluster_exists, pitr_window, not_degraded]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+    - { name: target, label: 恢复目标, type: object, required: true }
+    - { name: action, label: 恢复后动作, type: enum, required: true, enum: [pause, promote, shutdown], default: pause }
+    - { name: backup, label: 恢复前备份原数据, type: bool, required: false, default: true }
+  steps:
+    - cmd: pitr
+      cluster: "{{ cluster }}"
+
+- id: pitr-promote
+  title: 提升恢复后的主库
+  description: 恢复（action=pause）验证通过后，执行 pgsql-pitr.yml -t up 启动集群并恢复 HA。
+  category: backup
+  risk: high
+  gate: true
+  check: false
+  preconditions: [cluster_exists]
+  params:
+    - { name: cluster, label: 集群, type: pg_cluster, required: true }
+  steps:
+    - cmd: playbook
+      playbook: pgsql-pitr.yml
+      limit: "{{ cluster }}"
+      tags: [up]

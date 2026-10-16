@@ -1,0 +1,39 @@
+# Pigsty Console systemd 单元示例
+# 安装：
+#   install -m 0755 pigsty-console /usr/local/bin/pigsty-console
+#   install -m 0644 packaging/pigsty-console.service /etc/systemd/system/pigsty-console.service
+#   install -d -m 0700 /var/lib/pigsty-console
+#   /usr/local/bin/pigsty-console init --pigsty-home /root/pigsty --data-dir /var/lib/pigsty-console
+#   /usr/local/bin/pigsty-console user add admin --data-dir /var/lib/pigsty-console
+#   systemctl daemon-reload && systemctl enable --now pigsty-console
+[Unit]
+Description=Pigsty Console
+Documentation=https://pigsty.io/docs
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# 运行用户必须是安装 Pigsty 并持有 SSH 免密的管理用户（默认在线安装为 root）
+User=root
+Group=root
+WorkingDirectory=/root/pigsty
+ExecStart=/usr/local/bin/pigsty-console serve --pigsty-home /root/pigsty --data-dir /var/lib/pigsty-console
+# 让 Go 运行时立即把归还的页面还给内核（密码哈希的 argon2 工作内存），
+# 保证常驻内存在 40 MB 预算内
+Environment=GODEBUG=madvdontneed=1
+Restart=on-failure
+RestartSec=3
+KillSignal=SIGTERM
+TimeoutStopSec=15
+LimitNOFILE=8192
+# 只监听回环，外部经 Pigsty Nginx (infra_portal) 以 HTTPS 暴露
+NoNewPrivileges=no
+PrivateTmp=yes
+ProtectHome=no
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pigsty-console
+
+[Install]
+WantedBy=multi-user.target
